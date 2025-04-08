@@ -1,20 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>如何讲废话</title>
-    <url>/2025/04/05/%E7%AC%AC%E4%BA%8C%E7%AF%87%E5%8D%9A%E5%AE%A2/</url>
-    <content><![CDATA[如何讲废话首先我们应当学习废话是什么，到底废在哪里，只有知道怎么样的是废话，才能更好的讲废话
-]]></content>
-  </entry>
-  <entry>
     <title>尝试</title>
     <url>/2025/04/03/%E5%B0%9D%E8%AF%95/</url>
     <content><![CDATA[这是我的第一次尝试]]></content>
   </entry>
   <entry>
-    <title>友情链接</title>
-    <url>/link/index.html</url>
-    <content><![CDATA[]]></content>
+    <title>如何讲废话</title>
+    <url>/2025/04/05/%E7%AC%AC%E4%BA%8C%E7%AF%87%E5%8D%9A%E5%AE%A2/</url>
+    <content><![CDATA[如何讲废话首先我们应当学习废话是什么，到底废在哪里，只有知道怎么样的是废话，才能更好的讲废话
+]]></content>
   </entry>
   <entry>
     <title>关于我</title>
@@ -43,8 +38,8 @@
 }]]></content>
   </entry>
   <entry>
-    <title>小说</title>
-    <url>/novels/index.html</url>
+    <title>友情链接</title>
+    <url>/link/index.html</url>
     <content><![CDATA[]]></content>
   </entry>
   <entry>
@@ -60,6 +55,11 @@
   <entry>
     <title>音乐</title>
     <url>/music/index.html</url>
+    <content><![CDATA[]]></content>
+  </entry>
+  <entry>
+    <title>小说</title>
+    <url>/novels/index.html</url>
     <content><![CDATA[]]></content>
   </entry>
 </search>
