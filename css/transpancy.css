@@ -1,0 +1,310 @@
+/* 1. 容器对齐与间距 */
+.layout>div:first-child:not(.recent-posts) {
+    -webkit-align-self: flex-start;
+    align-self: flex-start;
+    -ms-flex-item-align: start;
+    padding: 50px 40px;
+}
+
+/* 2. 侧边栏卡片宽度控制 */
+#aside-content #card-toc .toc-content {
+    width: 340px;
+}
+
+#aside-content #card-toc .toc-content .toc-link {
+    font-size: 16px;
+}
+
+
+#aside-content .card-announcement .item-headline i {
+    color: rgb(53, 183, 41);
+}
+
+/*è¿™é‡Œæ”¾å¤–æ¡†*/
+/* body{
+    cursor:url(https://cdn.custom-cursor.com/db/5006/32/arrow2836.png) , default!important;
+    }
+    /*è¿™é‡Œæ”¾å†…æ¡†*/
+/* a,img,button{
+    cursor: url(https://cdn.custom-cursor.com/db/5005/32/arrow2836.png) , pointer !important;
+    } */ */
+ 
+
+.aplayer .aplayer-list ol li.aplayer-list-light, .aplayer, #aside_content .card-widget, .layout>div:first-child:not(.recent-posts), .layout_post>#page, .layout_post>#post, .read-mode .layout_post>#post{
+    /* ä»¥ä¸‹ä»£è¡¨ç™½è‰²é€æ˜Žåº¦ä¸º0.3 */
+    background: rgba(255, 255, 255, 0.9);
+    border:2px solid #0ff5ff;
+    box-shadow: 1px 1px 10px #0ff5ff;
+}
+
+
+
+/* 目录子元素样式​ */
+toc-child {
+    font-size: 10px;
+}
+
+/* 1. 背景与整体布局 */
+#post .post-copyright {
+    background: rgba(231, 252, 253, 0.9);
+}
+
+/* 元数据样式 */
+#post .post-copyright .post-copyright-meta {
+    color: #21597d;
+    font-weight: bold;
+}
+
+/* 正文内容样式 */
+#post .post-copyright .post-copyright-info {
+    padding-left: 6px;
+    color: #5274ba;
+}
+
+/* 4. 链接样式 */
+#post .post-copyright .post-copyright-info a {
+    padding-left: 6px;
+    color: #4b8de8
+}
+
+/* 页面容器样式​ */
+#git_container,
+#archive,
+#page {
+    background: rgba(214, 242, 244, 0.8);
+    /* 半透明浅蓝背景 */
+    border: 2px solid #0ff5ff !important;
+    /* 青色边框 */
+    box-shadow: 1px 1px 20px #0ff5ff !important;
+    /* 浅蓝投影 */
+}
+
+/* ​​卡片组件样式 */
+.card-widget {
+    border: 2px solid #3d0f3f00 !important;
+    /* 透明深灰边框 */
+    box-shadow: 1px 1px 20px #c4e8fc !important;
+    /* 浅蓝投影 */
+    --font-color: #2e8086;
+    /* 定义字体色变量 */
+    --text-highlight-color: #110101;
+    /* 定义高亮色变量 */
+}
+
+/* 暗色模式适配​ */
+[data-theme='dark'] {
+    --font-color: black;
+    --text-highlight-color: #fdeacc;
+}
+
+
+标题样式​ #subtitle,
+#site-title {
+    color: #ffffff !important;
+}
+
+
+
+.layout_page>div:first-child:not(.recent-posts),
+.layout_post>#page,
+.layout_post>#post,
+.read-mode .layout_post>#post {
+    background: var(--light_bg_color)
+}
+
+
+#aside-content .card-info .author-info__name {
+    font-weight: 500;
+    font-size: 2.57em;
+    color: #ffffff;
+}
+
+/* ç®€ä»‹ */
+#aside-content .card-info .author-info__description {
+    margin-top: -0.42em;
+    font-size: 1.30em;
+    color: #000000;
+}
+
+
+/* 边栏文章等 */
+.site-data>a .headline {
+    font-size: 20px;
+    color: #21597d;
+}
+
+/* 边栏文章等的数字 */
+.site-data>a .length-num {
+    margin-top: -0.32em;
+    color: var(--text-highlight-color);
+    font-size: 1.4em;
+}
+
+/* å¾®ä¿¡ */
+#aside-content .card-widget.card-announcement {
+    background-color: #a2d1b2;
+}
+
+/* ç›®å½• */
+#aside-content #card-toc {
+    background-color: #f5e9eb;
+}
+
+/* æœ€è¿‘æ–‡ç«  */
+#aside-content .card-widget.card-recent-post {
+    background-color: #e2ebda;
+}
+
+/* ç½‘ç«™ä¿¡æ¯ */
+#aside-content .card-widget.card-webinfo {
+    background-color: #c7c7c6;
+}
+
+/* å¾®åšä¿¡æ¯ */
+#weibo.card-widget {
+    background: linear-gradient(to right, #ff5f6d, #ffc371);
+    /* æ·»åŠ å…¶ä»–æ ·å¼ */
+    border-radius: 10px;
+    color: #0ff5ff ;
+    border-width: 10px;
+}
+
+
+
+@-webkit-keyframes Gradient {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+@-moz-keyframes Gradient {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+@keyframes Gradient {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/* ä¸ªäººä¿¡æ¯Follow meæŒ‰é’® */
+#aside-content>.card-widget.card-info>#card-info-btn {
+    background-color: #3eb8be;
+    border-radius: 8px;
+}
+
+
+/* æ³¢æµª */
+/* æ³¢æµªcss */
+.main-hero-waves-area {
+    width: 100%;
+    position: absolute;
+    left: 0;
+    bottom: -11px;
+    z-index: 5;
+}
+
+.waves-area .waves-svg {
+    width: 100%;
+    height: 5rem;
+}
+
+/* Animation */
+
+.parallax>use {
+    animation: move-forever 25s cubic-bezier(0.55, 0.5, 0.45, 0.5) infinite;
+}
+
+.parallax>use:nth-child(1) {
+    animation-delay: -2s;
+    animation-duration: 7s;
+    fill: #f7f9febd;
+}
+
+.parallax>use:nth-child(2) {
+    animation-delay: -3s;
+    animation-duration: 10s;
+    fill: #f7f9fe82;
+}
+
+.parallax>use:nth-child(3) {
+    animation-delay: -4s;
+    animation-duration: 13s;
+    fill: #f7f9fe36;
+}
+
+.parallax>use:nth-child(4) {
+    animation-delay: -5s;
+    animation-duration: 20s;
+    fill: #f7f9fe;
+}
+
+/* é»‘è‰²æ¨¡å¼èƒŒæ™¯ */
+[data-theme="dark"] .parallax>use:nth-child(1) {
+    animation-delay: -2s;
+    animation-duration: 7s;
+    fill: #18171dc8;
+}
+
+[data-theme="dark"] .parallax>use:nth-child(2) {
+    animation-delay: -3s;
+    animation-duration: 10s;
+    fill: #18171d80;
+}
+
+[data-theme="dark"] .parallax>use:nth-child(3) {
+    animation-delay: -4s;
+    animation-duration: 13s;
+    fill: #18171d3e;
+}
+
+[data-theme="dark"] .parallax>use:nth-child(4) {
+    animation-delay: -5s;
+    animation-duration: 20s;
+    fill: #18171d;
+}
+
+/* 1. 波浪动画 */
+@keyframes move-forever {
+    0% {
+        transform: translate3d(-90px, 0, 0);
+    }
+
+    100% {
+        transform: translate3d(85px, 0, 0);
+    }
+}
+
+/*Shrinking for mobile*/
+@media (max-width: 768px) {
+    .waves-area .waves-svg {
+        height: 40px;
+        min-height: 40px;
+    }
+}
