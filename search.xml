@@ -51,7 +51,7 @@ pyquery（css语句）这次主要以xpath技术为主，xpath的编码流程：
 代码中我们需要使用一个新的包lxml,可以通过下述在终端中进行下载
 pip install lxml
 from lxml import etree    #先创建一个etree对象，把数据加载到etree中去  tree = etree.parse(&#x27;test.html&#x27;)    #对数据进行提取  #xpath函数返回的是列表，列表中存储的是满足定位要求的所有标签  #具体获取html下的head中的title  ret = tree.xpath(&#x27;/html/head/title&#x27;)  #   ‘//’获取所有的title  ret1 = tree.xpath(&#x27;//title&#x27;)    #对&lt;body&gt;中的数据进行提取,你会发现有多个&lt;div&gt;  ret2 = tree.xpath(&#x27;//div&#x27;) #获取所有的div  ret3 = tree.xpath(&#x27;//div[@class=&quot;song&quot;]&#x27;) #获取class为song的数据  ret4 = tree.xpath(&#x27;//div[@class=&quot;song&quot;]/p&#x27;)#获取该div下的p标签数据    #运行之后你会发现他给的都是&lt;Element p at 0x2555a90de80&gt;这样的数据  #如果要获得文本数据，则需要使用text()  ret5 = tree.xpath(&#x27;//a[@id=&quot;feng&quot;]/text()&#x27;) #提取对应a中的数据  ret6 = tree.xpath(&#x27;//a//text()&#x27;) #提取a下所有的文本数据  #总结：/text（）提取对应下的文本，//text()提取所有的文本    #提取标签的属性值，比如图片地址 //tag/@attrNameret7 = tree.xpath(&#x27;//img/@src&#x27;)  print(ret7)
-1.2 碧血剑小说网址：https://bixuejian.5000yan.com/结果：将各个章节的标题和内容进行爬取然后存储到文件中
+1.2 碧血剑小说网址：https://bixuejian.5000yan.com/结果：将各个章节的标题和内容进行爬取然后存储到文件中先找到对应的标签的位置然后右键即可复制xpath，减少工作量
 ]]></content>
   </entry>
   <entry>
