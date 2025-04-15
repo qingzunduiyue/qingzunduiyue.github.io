@@ -1,549 +1,145 @@
 <?xml version="1.0" encoding="utf-8"?>
-<search>
-  <entry>
-    <title>python爬虫学习（一）</title>
-    <url>/2025/04/13/python%E7%88%AC%E8%99%AB/</url>
-    <content><![CDATA[1.前言本篇开始想要从基础的爬虫案例开始，逐步完成爬虫相关技术的学习，在本篇中，我会用东方财富 、51游戏、中国人事考试网等案例进行，从易到难。
-2.爬虫功能分类在进行案例之前先说明一下爬虫的功能分类，一共有如下几种    通用爬虫：直接对页面的所有数据进行爬取    聚焦爬虫：对页面中的数据有选择性的爬取    功能爬虫：通过浏览器或者app实现自动化爬取    增量式爬虫：对新更新的数据进行补充爬取，以前爬取的数据不再新爬取    分布式爬虫：搭建分布式集群对网络资源进行联合且分布的爬取当然本篇的案例只是很基础的案例，甚至代码都不会多
-3.1 东方财富网网址：https://www.eastmoney.com/
-import requests url = &#x27;https://www.eastmoney.com/&#x27;#向指定URL进行请求，响应数据response = requests.get(url =url) response.encoding = &#x27;utf-8&#x27;page = response.text #text返回的是字符串的响应数据with open(&#x27;dongfang.html&#x27;,&#x27;w&#x27;) as fp: #如果返回还有编码问题，在open中也加个 encoding=&#x27;utf-8&#x27; 	fp.write(page) #这里的page是上述获取的响应数据
-通过运行上方代码即可得到，下述内容的文件在右上角四个浏览器中选择一个进入即可看到爬取成果
-3.2 51游戏网网址：https://www.51.com/
-
-上一个案例中，只是简单的对url的首页进行通用爬取，但事实上你进入一个网站肯定不会只因为其主页，比如这个游戏网，你若想搜集带有“王者”这个关键词的游戏仅靠先前给出代码无法实现该需求此时可以先进入网页去搜索看看相关的网址会是什么样通过类似输入多个关键词，会发现url前面https://game.51.com/search/action/game/都没有改变，只有后面的&quot;王者&quot;这个关键词变化了，所以对应的代码也会对应变化import requests    game_title = input(&#x27;请输入想要搜索的关键词：&#x27;)  #存放需要的请求参数params = &#123;    &#x27;q&#x27;: game_title  &#125;    url= &quot;https://www.51.com/&quot;  #这是搜索的网址头first_url = &#x27;https://game.51.com/search/action/game/&#x27;  response = requests.get(url=first_url,params=params)  response.encoding = &#x27;utf-8&#x27;  page_51 = response.text    with open(&#x27;51.html&#x27;,&#x27;w&#x27;,encoding=&#x27;utf-8&#x27;) as fp:      fp.write(page_51)
-
-3.3 中国人事考试网
-网址 http://www.cpta.com.cn/如果你根据先前的代码去进行爬取，并不会报错，但是当你将爬取到的网址打开以后并不会得到对应网址，而是如下图的报错。
-
-于是据此，提出一个说法，对于此类问题都是由于爬虫模拟浏览器的程度不够，网站认为我的这个id不正常，不属于正常用户访问浏览器的id所以无法进行爬取，所以，我们需要在代码中加入header，也就是请求头，你可以通过在浏览器中按F12，进入开发者模式请求标头的就是正常用户提出请求会携带的数据，而先前的代码中并没有这些，所谓的反爬机制就是这样找到你模拟不够完善的地方，然后组织爬虫代码访问，但并不是说请求头中的所有都需要填进去，多数仅需要UA和cookie就可以使得代码正常运行(对应数据按照上述图去找到复制即可)
-import requests  url = &#x27;http://www.cpta.com.cn/&#x27;  header = &#123;      &#x27;user-agent&#x27;:&#x27;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36&#x27;  &#125;    response = requests.get(url=url,headers=header)  response.encoding= &#x27;utf-8&#x27;  page_cpta = response.text  with open(&#x27;cpta.html&#x27;,&#x27;w&#x27;,encoding= &#x27;utf-8&#x27;) as f:      f.write(page_cpta)
-当然获取的文件中可能会只包含数据，一些网站的设计排版不一定会有，但数据爬到就可以了如果我们想要更进一步搜索，比如想搜“人力资源”相关的信息，肯定还需要另外的代码，在写之前可以去实际网页搜索试试，看看网址有什么关系你会发现这个页面和之前的51游戏页面有有所不同这里的网址值只有search，无论你搜什么关键词，网址都只是这个，此时你可以打开F12，查看相关信息，你会发现与之前的请求方式不同，这个页面采用的是post请求方式post数据往往会返回数据存储在json文件中，所以你应当去找对应的数据，也就是标头右边的载荷将这里的数据复制到代码中再进行爬虫就可以达成效果
-import requests  url = &#x27;http://www.cpta.com.cn/category/search&#x27;  key_word = input(&#x27;请输入想要搜索的关键词：&#x27;)  params = &#123;        &#x27;keywords&#x27;: key_word ,      &#x27;搜 索&#x27;: &#x27;搜 索&#x27;  &#125;  header = &#123;  &#x27;user-agent&#x27;: &#x27;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36&#x27;,  &#125;  response = requests.post(url= url,headers=header, params=params)  response.encoding=&#x27;utf=8&#x27;  page_cpta = response.text  with open(&#x27;cpta_search.html&#x27;,&#x27;w&#x27;,encoding=&#x27;utf-8&#x27;) as f:      f.write(page_cpta)
-4. KFC餐厅
-网址：http://www.kfc.com.cn/kfccda/storelist/index.aspx
-在这里你若是想要通过关键词去进行查询你会发现，它并不会挑跳转到新网址，但是你若是按原本网址来却只能获取到无搜索时的数据。
-这是因为在页面数据中有一种数据名为动态数据，动态加载数据值不是直接通过浏览器地址栏的url请求到的数据，这些数据叫做动态加载数据。
-那么怎么判别数据是否是动态数据呢？你可以通过开发者模式，进入到当前页面的network
-查找窗口可以通过ctrl+f 进行呼出，输入关键词，然后在响应中去搜索关键词看看是否能找到对应的数据，若无贼说明是动态数据
-可以通过动态数据左上角的全局搜索进行找到对应文件
-动态数据往往会用json存储，所以写代码的时候得留意，并且数据往往不止一页，有多页，需要采取多页连续采取import requests  key_word = input(&#x27;请输入关键词:&#x27;)  page_input = input(&#x27;请输入页码(如1-5或1,2,3)：&#x27;)    pages=[]  if &#x27;-&#x27; in page_input:      start,end = map(int, page_input.split(&#x27;-&#x27;))      pages= list(range(start, end+1))  else:      pages = [int(page_input)]    with open(&#x27;kfc1.txt&#x27;,&#x27;w&#x27;,encoding=&#x27;utf-8&#x27;) as f:      f.write(&quot;门店名称\t地址\n&quot;)  # 写入表头      for page in pages:          url = &#x27;http://www.kfc.com.cn/kfccda/ashx/GetStoreList.ashx?op=keyword&#x27;          header = &#123;          &#x27;user-agent&#x27;: &#x27;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36&#x27;          &#125;          data = &#123;              &#x27;cname&#x27;:&#x27;&#x27; ,               &#x27;pid&#x27;: &#x27;&#x27;,              &#x27;keyword&#x27;: key_word,              &#x27;pageIndex&#x27;: page,              &#x27;pageSize&#x27;: &#x27;10&#x27;          &#125;            response = requests.post(url=url,headers=header,data=data)          response.encoding= &#x27;utf-8&#x27;          page_KFC = response.json()            for detail in page_KFC[&#x27;Table1&#x27;]:              storename = detail.get(&#x27;storeName&#x27;, &#x27;N/A&#x27;)              add = detail.get(&#x27;addressDetail&#x27;, &#x27;N/A&#x27;)              f.write(f&quot;&#123;storename&#125;\t&#123;add&#125;\n&quot;)              print(f&quot;成功保存：&#123;storename&#125;-&#123;add&#125;&quot;)
-
-]]></content>
-  </entry>
-  <entry>
-    <title>python爬虫学习（二）</title>
-    <url>/2025/04/15/%E7%88%AC%E8%99%AB%EF%BC%88%E4%BA%8C%EF%BC%89/</url>
-    <content><![CDATA[1、数据解析- 
-]]></content>
-  </entry>
-  <entry>
-    <title></title>
-    <url>/css/custom.css</url>
-    <content><![CDATA[/* 导航栏模块 */
-/* 一级菜单居中 */
-#nav .menus_items {
-    position: absolute !important;
-    width: fit-content !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    font-size: 25px !important; /* 独立于全局字体 */
-      
-}
-
-/* 子菜单横向展示 */
-#nav .menus_items .menus_item:hover .menus_item_child {
-    display: row !important;
-}
-
-/* 这里的2是代表导航栏的第2个元素，即有子菜单的元素，可以按自己需求修改 */
-.menus_items .menus_item:nth-child(5) .menus_item_child {
-    left: -50px;
-}
-
-
-
-/* 背景的通明度模块 */
-/* 文章页背景 */
-.layout_post>#post {
-    /* 以下代表透明度为0.7 可以自行修改*/
-    background: rgba(255,255,255,.9);
-
-}
- 
-/* 所有页面背景 */
-#aside_content .card-widget, #recent-posts>.recent-post-item, .layout_page>div:first-child:not(.recent-posts), .layout_post>#page, .layout_post>#post, .read-mode .layout_post>#post{
-    /* 以下代表透明度为0.7 */
-    background: rgba(255,255,255,.9);
-    border:2px solid #0ff5ff;
-    box-shadow: 1px 1px 10px #0ff5ff;
- 
-}
-/* 侧边卡片的透明度 */
-:root {
-  --card-bg: rgba(255, 255, 255, .9);
-}
-
-/* 页脚透明 */
-#footer {
-	/* 以下代表透明度为0.7 */
-	background: rgba(255,255,255, .0);
-}
- 
-
-:root {
-    --global-font-size: 20px;
-}
-
-
-.aplayer .aplayer-list ol li.aplayer-list-light, .aplayer, #aside_content .card-widget, #recent-posts>.recent-post-item, .layout>div:first-child:not(.recent-posts), .layout_post>#page, .layout_post>#post, .read-mode .layout_post>#post{
-    /* ä»¥ä¸‹ä»£è¡¨ç™½è‰²é€æ˜Žåº¦ä¸º0.3 */
-    background: rgba(255, 255, 255, 0.9);
-    border:2px solid #0ff5ff;
-    box-shadow: 1px 1px 10px #0ff5ff;
-}
-
-
-
-
-
-
+<search> 
   
- .recent-post-item{
-
-    background: rgba(255, 255, 255, 0.9);
-    border:2px solid #0ff5ff;
-    box-shadow: 1px 1px 10px #0fffc3;
-}
-]]></content>
-  </entry>
-  <entry>
-    <title>关于我</title>
-    <url>/about/index.html</url>
-    <content><![CDATA[]]></content>
-  </entry>
-  <entry>
-    <title></title>
-    <url>/css/transpancy.css</url>
-    <content><![CDATA[/* 1. 容器对齐与间距 */
-.layout>div:first-child:not(.recent-posts) {
-    -webkit-align-self: flex-start;
-    align-self: flex-start;
-    -ms-flex-item-align: start;
-    padding: 50px 40px;
-}
-
-/* 2. 侧边栏卡片宽度控制 */
-#aside-content #card-toc .toc-content {
-    width: 340px;
-}
-
-#aside-content #card-toc .toc-content .toc-link {
-    font-size: 16px;
-}
-
-
-#aside-content .card-announcement .item-headline i {
-    color: rgb(53, 183, 41);
-}
-
-/*è¿™é‡Œæ”¾å¤–æ¡†*/
-/* body{
-    cursor:url(https://cdn.custom-cursor.com/db/5006/32/arrow2836.png) , default!important;
-    }
-    /*è¿™é‡Œæ”¾å†…æ¡†*/
-/* a,img,button{
-    cursor: url(https://cdn.custom-cursor.com/db/5005/32/arrow2836.png) , pointer !important;
-    } */ */
- 
-
-.aplayer .aplayer-list ol li.aplayer-list-light, .aplayer, #aside_content .card-widget, .layout>div:first-child:not(.recent-posts), .layout_post>#page, .layout_post>#post, .read-mode .layout_post>#post{
-    /* ä»¥ä¸‹ä»£è¡¨ç™½è‰²é€æ˜Žåº¦ä¸º0.3 */
-    background: rgba(255, 255, 255, 0.9);
-    border:2px solid #0ff5ff;
-    box-shadow: 1px 1px 10px #0ff5ff;
-}
-
-
-
-/* 目录子元素样式​ */
-toc-child {
-    font-size: 10px;
-}
-
-/* 1. 背景与整体布局 */
-#post .post-copyright {
-    background: rgba(231, 252, 253, 0.9);
-}
-
-/* 元数据样式 */
-#post .post-copyright .post-copyright-meta {
-    color: #21597d;
-    font-weight: bold;
-}
-
-/* 正文内容样式 */
-#post .post-copyright .post-copyright-info {
-    padding-left: 6px;
-    color: #5274ba;
-}
-
-/* 4. 链接样式 */
-#post .post-copyright .post-copyright-info a {
-    padding-left: 6px;
-    color: #4b8de8
-}
-
-/* 页面容器样式​ */
-#git_container,
-#archive,
-#page {
-    background: rgba(214, 242, 244, 0.8);
-    /* 半透明浅蓝背景 */
-    border: 2px solid #0ff5ff !important;
-    /* 青色边框 */
-    box-shadow: 1px 1px 20px #0ff5ff !important;
-    /* 浅蓝投影 */
-}
-
-/* ​​卡片组件样式 */
-.card-widget {
-    border: 2px solid #3d0f3f00 !important;
-    /* 透明深灰边框 */
-    box-shadow: 1px 1px 20px #c4e8fc !important;
-    /* 浅蓝投影 */
-    --font-color: #2e8086;
-    /* 定义字体色变量 */
-    --text-highlight-color: #110101;
-    /* 定义高亮色变量 */
-}
-
-/* 暗色模式适配​ */
-[data-theme='dark'] {
-    --font-color: black;
-    --text-highlight-color: #fdeacc;
-}
-
-
-标题样式​ #subtitle,
-#site-title {
-    color: #ffffff !important;
-}
-
-
-
-.layout_page>div:first-child:not(.recent-posts),
-.layout_post>#page,
-.layout_post>#post,
-.read-mode .layout_post>#post {
-    background: var(--light_bg_color)
-}
-
-
-#aside-content .card-info .author-info__name {
-    font-weight: 500;
-    font-size: 2.57em;
-    color: #ffffff;
-}
-
-/* ç®€ä»‹ */
-#aside-content .card-info .author-info__description {
-    margin-top: -0.42em;
-    font-size: 1.30em;
-    color: #000000;
-}
-
-
-/* 边栏文章等 */
-.site-data>a .headline {
-    font-size: 20px;
-    color: #21597d;
-}
-
-/* 边栏文章等的数字 */
-.site-data>a .length-num {
-    margin-top: -0.32em;
-    color: var(--text-highlight-color);
-    font-size: 1.4em;
-}
-
-/* å¾®ä¿¡ */
-#aside-content .card-widget.card-announcement {
-    background-color: #a2d1b2;
-}
-
-/* ç›®å½• */
-#aside-content #card-toc {
-    background-color: #f5e9eb;
-}
-
-/* æœ€è¿‘æ–‡ç«  */
-#aside-content .card-widget.card-recent-post {
-    background-color: #e2ebda;
-}
-
-/* ç½‘ç«™ä¿¡æ¯ */
-#aside-content .card-widget.card-webinfo {
-    background-color: #c7c7c6;
-}
-
-/* å¾®åšä¿¡æ¯ */
-#weibo.card-widget {
-    background: linear-gradient(to right, #ff5f6d, #ffc371);
-    /* æ·»åŠ å…¶ä»–æ ·å¼ */
-    border-radius: 10px;
-    color: #0ff5ff ;
-    border-width: 10px;
-}
-
-
-
-@-webkit-keyframes Gradient {
-    0% {
-        background-position: 0% 50%;
-    }
-
-    50% {
-        background-position: 100% 50%;
-    }
-
-    100% {
-        background-position: 0% 50%;
-    }
-}
-
-@-moz-keyframes Gradient {
-    0% {
-        background-position: 0% 50%;
-    }
-
-    50% {
-        background-position: 100% 50%;
-    }
-
-    100% {
-        background-position: 0% 50%;
-    }
-}
-
-@keyframes Gradient {
-    0% {
-        background-position: 0% 50%;
-    }
-
-    50% {
-        background-position: 100% 50%;
-    }
-
-    100% {
-        background-position: 0% 50%;
-    }
-}
-
-/* ä¸ªäººä¿¡æ¯Follow meæŒ‰é’® */
-#aside-content>.card-widget.card-info>#card-info-btn {
-    background-color: #3eb8be;
-    border-radius: 8px;
-}
-
-
-/* æ³¢æµª */
-/* æ³¢æµªcss */
-.main-hero-waves-area {
-    width: 100%;
-    position: absolute;
-    left: 0;
-    bottom: -11px;
-    z-index: 5;
-}
-
-.waves-area .waves-svg {
-    width: 100%;
-    height: 5rem;
-}
-
-/* Animation */
-
-.parallax>use {
-    animation: move-forever 25s cubic-bezier(0.55, 0.5, 0.45, 0.5) infinite;
-}
-
-.parallax>use:nth-child(1) {
-    animation-delay: -2s;
-    animation-duration: 7s;
-    fill: #f7f9febd;
-}
-
-.parallax>use:nth-child(2) {
-    animation-delay: -3s;
-    animation-duration: 10s;
-    fill: #f7f9fe82;
-}
-
-.parallax>use:nth-child(3) {
-    animation-delay: -4s;
-    animation-duration: 13s;
-    fill: #f7f9fe36;
-}
-
-.parallax>use:nth-child(4) {
-    animation-delay: -5s;
-    animation-duration: 20s;
-    fill: #f7f9fe;
-}
-
-/* é»‘è‰²æ¨¡å¼èƒŒæ™¯ */
-[data-theme="dark"] .parallax>use:nth-child(1) {
-    animation-delay: -2s;
-    animation-duration: 7s;
-    fill: #18171dc8;
-}
-
-[data-theme="dark"] .parallax>use:nth-child(2) {
-    animation-delay: -3s;
-    animation-duration: 10s;
-    fill: #18171d80;
-}
-
-[data-theme="dark"] .parallax>use:nth-child(3) {
-    animation-delay: -4s;
-    animation-duration: 13s;
-    fill: #18171d3e;
-}
-
-[data-theme="dark"] .parallax>use:nth-child(4) {
-    animation-delay: -5s;
-    animation-duration: 20s;
-    fill: #18171d;
-}
-
-/* 1. 波浪动画 */
-@keyframes move-forever {
-    0% {
-        transform: translate3d(-90px, 0, 0);
-    }
-
-    100% {
-        transform: translate3d(85px, 0, 0);
-    }
-}
-
-/*Shrinking for mobile*/
-@media (max-width: 768px) {
-    .waves-area .waves-svg {
-        height: 40px;
-        min-height: 40px;
-    }
-}]]></content>
-  </entry>
-  <entry>
-    <title>音乐</title>
-    <url>/music/index.html</url>
-    <content><![CDATA[]]></content>
-  </entry>
-  <entry>
-    <title>电影</title>
-    <url>/movies/index.html</url>
-    <content><![CDATA[]]></content>
-  </entry>
-  <entry>
-    <title>友情链接</title>
-    <url>/link/index.html</url>
-    <content><![CDATA[]]></content>
-  </entry>
-  <entry>
-    <title>小说</title>
-    <url>/novels/index.html</url>
-    <content><![CDATA[]]></content>
-  </entry>
-  <entry>
-    <title>tags</title>
-    <url>/tags/index.html</url>
-    <content><![CDATA[]]></content>
-  </entry>
-  <entry>
-    <title>隐藏在时光里的回忆</title>
-    <url>/%E5%9B%9E%E5%BF%86/index.html</url>
-    <content><![CDATA[序 回忆璀璨如花嵊县的秋季格外凉爽，兴许是军训的后遗症，又或许是因为全球变暖让楚宇这颗心系世和平的心莫名的烦躁，趁老师不注意，趴在桌子上百无聊赖地望着窗外一片一片下落的银杏。
-还没多看几眼便被一旁的男生用笔戳了戳腰，
-“别发呆了，我看君姐已经瞥了你好几眼了，你是真喜欢上她办公室的龙井了？”
-楚宇稍微起了起身子，给同桌翻了个白眼，露出手肘下面的翻在《荷塘月色》一面的语文书，
-“啧，我这可不叫发呆，我只是在体会朱自清先生‘什么都可以想，什么都可以不想’的意境！还有，你这个开学没多久就因为上课看小说跟老师混熟的也没资格说我吧。”
-说罢，楚宇还翘起嘴巴，用下巴点了点同桌本子下藏着的《花火》。
-“但我成绩全班前三。”面对楚宇的挑衅，其同桌轻描淡写地答道。
-楚宇忍住想要怒拍桌子的手，声音低沉地抗议，“难道成绩好就可以为所欲为吗!气抖冷，学渣什么时候才能站起来！”
-同桌翻了翻白眼，道：“呵，站起来也给你腿打折，而且，成绩好确实可以为所欲为。”
-楚宇刚要开口怼回去，就听得讲台上一阵河东狮吼传过：“楚宇，江耿给我站起来！楚宇，你来回答荷塘月色一共分为几部分，分别用几幅图来概括各部分内容。
-楚宇回答不出来，江耿接着，要是都不会，这节课就站着吧。”
-这两同桌一个发呆，一个看小说，最终结果自然是全军覆没。
-当君姐重新开始上课时，两人不约而同的侧向对方，骂道：
-“还不都是因为你！”
-“还不都是因为你！”
-……..
-“向前跑！
-迎着眼泪和嘲笑，
-生命的广阔不经历风雨怎能感到…….”
-一阵手机铃声将楚宇从睡梦中惊醒，楚宇左脚一踹，碰到守株待兔的墙壁，顿时缩进被窝里裹成史莱姆状，捂着脚指头瑟瑟发抖，将刚刚响铃抛之脑后。
-但是电话铃却是不肯停歇，没一会又响了起来。
-史莱姆状的被窝先是沉寂几秒钟，然后被色史莱姆缓缓向床头蠕动，伸出一只手，摸到床头的手机，看了看联系人，不耐烦地接到：“喂，徐正言！不知道放假人，人上人，扰人清梦可是大忌啊！”
-“……”电话那先是一阵沉默，随即传来一阵怒吼，“你是不是忘了今天还要回学校！再不过来，老张就要来亲自问候您了！”
-本还在撞墙以及起床气双重debuff中的楚宇听到“老张”二字突然清醒，瞥了一眼手机上的时间日期，顾不得留恋温暖的被窝，毫无形象地从床上爬起。
-…………
-紧赶慢赶，当楚宇冲进教室时，老张似乎还没到，同学们三三两两地坐一块，毕竟也算是高中毕业了，多数人都是把手机带来了。有王者开黑的，有聚在一块插科打诨的，嗯，也有刚毕业就斥巨资买了个索尼新款耳机然后就整天机不离手不知道搁那听啥的憨憨。
-楚宇径直地走向自己座位，把同桌的耳机摘了下来，戴到了自己耳朵上，听着耳机中传来林肯公园的《In The End》，向徐正言问道：
-“老张有没有来过？毕业典礼啥时候开始啊？”
-兴许是对楚宇拿耳机的不爽，楚宇面对徐正言故意光张嘴不说话的幼稚行为，大声回怼：
-“你刚电话里不说的顶凶？现在见面了不敢说话了？”
-徐正言显然是不知道楚宇会这么回答，先是一怔，然后一把把耳机从楚宇头上摘下，
-“他喵的你带着降噪耳机跟我说话你是想咋样啊喂，还我不敢说话，你怎么这么能啊！我……”
-还没等徐正言骂完，班主任张德新出现在门口，走进教室，不得不说即使毕业了，班主任的威严是丝毫不减，班里瞬间鸦雀无声，玩手机的也不自觉的把手机藏了藏。徐正言白了楚宇一眼，也正了正身子。
-“今天的流程十分简短，等你们听完毕业典礼，回来自己整完书就可以回去了。
-去之前让我再唠叨几句，高考前，总是抓着你们念，高考是你们转折点，反复提醒，显得高考失败人生都输了似的，
-现在肯定不会这么说，哪怕你高考失利，大学只要加把劲，考研也能考一个好学校……”
-老班这段透着“主要唠叨会随当前情境改变”变相劝学的言论，不由得引起同学们的轻笑。
-楚宇也放松起来，身子趴在桌上，看着讲台上还在念叨的老班，好笑又有些伤感的想到，
-“都毕业了还是不忘催我们去学习啊。”
-开学典礼，学生大会，结业典礼……三年来在学校参加的数不胜数的会典都是大同小异，校长演讲，表扬，鸡汤等等。无论是经历过学生时代，还是正处于青春对此想必都耳熟能详。
-许是老张难得没敷衍我们，典礼流程确实简短，也有可能是有着手机打发时间，转眼间典礼就结束了，同学们闹哄哄地跑向教室，边跑边跟着一旁的同学吐槽，
-“学校？我可是不能多待一秒！冲冲冲！”
-徐正言也是手脚利落，三下五除二便把书整理好，见楚宇坐在位置上看着手机发呆，用力拍了一下楚宇的背，顺势将头一伸，
-“跟哪个妹纸聊天呢？书都还没整完？”
-但显然是楚宇熄屏键按得更快，待徐正言定睛看清，只能看到黑屏上倒映的自己。
-楚宇没好气地说道：“就你整天爱吃瓜，我哪像你这么不爱学习书这么少，我爸妈还没到呢，咱整完书也没地放。”
-徐正言对这种高考完一点书不整直接奔回家，现在还如此理直气壮的行为不做表示，向楚宇挥了挥手，留下句，“暑假聚”，转身离去，只给楚宇留下个后脑勺。
-过了没多久，楚宇趁着父母没到，带着早上匆忙拿来的袋子也走出了教室。
-…………
-窗外树影婆娑，木槿摇曳，朦胧的月色星光不知被何人碾碎，织起一浣轻纱，平铺在天空之中。
-夏日的夜晚仍是可以清凉的，楚宇坐在书桌前，感受着一阵阵微风拂来，看着桌上的日记本。
-这是楚宇下午整理出来的，刚翻出来时，它混杂在一堆教科书作业本中，虽然高考前三个月完全忘记了日记这回事，将其埋没于书海中，1但意外地没有褶皱，安静地躺着，像是隐藏在时光中似的。
-花了几个小时把整本日记浏览了一遍，然后在开头故意留出的空白的一页提笔写下，
-回忆璀璨如花
-第一章八月末的阳光格外的毒辣，原本清凉的早晨的微风也带着一丝燥热，几只飞鸟路过，穿过如今已愈发少见的喷气式飞机留下的痕迹，此时知了的精力最是旺盛，阳光透过树叶形成斑驳的小圆影，打在鸣叫的知了上，宛若为其穿上了新衣。
-原本安逸的校园因为一些“不速之客”打破了此时祥和的氛围。
-“砰！”
-楚宇用自己的身体将虚掩着的门撞开，灰尘扬起，在阳光的照射下格外显眼，如同精灵般飞舞着。
-拿着大包小包的楚宇平复着略微有点喘的呼吸，心里念叨着，
-“嘁，出师不利，七点多就来学校不说，刚入学就让我爬六楼给我来个下马威是吧，以后放学已经不想回寝室了。”
-若是能回到前一天晚上，他一定会把那个义正严词地拒绝了母亲想要来帮忙搬运行李的请求，拍着胸脯发誓一个人也能搞定的自己打一顿，然后哭求妈妈再爱我一次。
-当然这些臆想也就一闪而过，毕竟还有一堆行李要整，他回过神仔细环顾了四周，将自己未来几年居住的寝室布局纳入眼帘：
-抬头正对门的便是卫生间，储物柜在入门左手，兴许因为是c形楼最边上的寝室，与先前瞥到的别的寝室床、柜子、卫生间堆挤在一个房间的布局不同，楚宇寝室的储物柜与卫生间独立在一个隔间，右手的过道穿过个约一人半长宽的门形口子才到摆放着几张双人床的“住宿区”，过道的尽头便是阳台。
-楚宇粗略地扫了一眼过道，虽然寝室许久没有人，但看起来还是蛮干净的。先前自己还担忧得废些力气才能打扫完工。
-待楚宇拖着行李箱以及装着被褥的寝室袋进去寝室，才发现寝室这么干净是有原因的——有位男生在阳台死角上，似是听到动静，正好冒出个头，望向楚宇。
-阳台的窗户开着，一阵微风拂过，吹起男生的碎发，那位男生似是双腿一蹬，楚宇便看到男生“咕噜，咕噜”的坐着行李箱划了出来，他从行李箱小跳了下来，面带微笑地走过来帮忙拿行李，说道：
-“你也是601的吧？我叫江耿，将来几年就好好相处喽！”
-“谢谢帮忙，额……我叫楚宇。”楚宇表面上没有异样，但心里完全任由吐槽本能爆发。
-“啧啧，可恶啊，热情开朗还长得小帅，妥妥的人生赢家模板啊，唯一的不足是身高似乎只有170出头，嗯比我矮好些。”
-楚宇自然也知道身高的比较只是毫无意义的逞强，但是男人的迷之胜负欲就是如此，孔子都说三人行必有我师，自己总得有些比得过人家的方面是吧。
-虽说楚宇思绪越飘越远，但手上没闲着，找到自己靠阳台侧上铺的床位，将一些行李放在上面。
-说来也巧，另一旁的上铺的被褥也已经整理好了，不用多想也能猜到这就是那位江耿同学的床位。
-兴许是江耿在阳台的活也干完了，他并没有回阳台继续捣鼓，而是打开行李箱整理衣服。楚宇也开始了整理被褥、铺床，短短几分钟，601寝室便出现了安静—热闹—寂静的不同氛围，没错，你没看错就是寂静，若是江耿继续回阳台干活，楚宇倒也不会怎么样，但当其也在“住宿区”整理时，两者皆不说话的氛围就让楚宇有些待不住了，感觉气氛一度凝固。当楚宇快忍不住，准备找些垃圾话活跃活跃气氛时，江耿也发话了：
-“学校规定的是九点半到校吧，这才七点出头，你为什么来的这么早？要不是尚东那的公交车来城里只有六点多的，我现在还睡着呢！”
-闻言，楚宇也是暗松了口气，在听到江耿是尚东的后，也了然原因，楚宇父亲也是尚东镇的，偶尔自驾来回一趟便要花费不少时间，更别说是坐城乡公交车了，导致平日里那边公交车的排班确实不多。楚宇没放下手中的工作，边整理边回答：
-“”
-]]></content>
-  </entry>
-  <entry>
-    <title>醉欢行</title>
-    <url>/%E9%86%89%E6%AC%A2%E8%A1%8C/index.html</url>
-    <content><![CDATA[]]></content>
-  </entry>
+  
+    
+    <entry>
+      <title>python爬虫学习（二）</title>
+      <link href="/2025/04/15/%E7%88%AC%E8%99%AB%EF%BC%88%E4%BA%8C%EF%BC%89/"/>
+      <url>/2025/04/15/%E7%88%AC%E8%99%AB%EF%BC%88%E4%BA%8C%EF%BC%89/</url>
+      
+        <content type="html"><![CDATA[<h1 id="1、数据解析"><a href="#1、数据解析" class="headerlink" title="1、数据解析"></a>1、数据解析</h1><p>- </p>]]></content>
+      
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>python爬虫学习（一）</title>
+      <link href="/2025/04/13/python%E7%88%AC%E8%99%AB/"/>
+      <url>/2025/04/13/python%E7%88%AC%E8%99%AB/</url>
+      
+        <content type="html"><![CDATA[<h1 id="1-前言"><a href="#1-前言" class="headerlink" title="1.前言"></a>1.前言</h1><p>本篇开始想要从基础的爬虫案例开始，逐步完成爬虫相关技术的学习，在本篇中，我会用东方财富 、51游戏、中国人事考试网等案例进行，从易到难。</p><h1 id="2-爬虫功能分类"><a href="#2-爬虫功能分类" class="headerlink" title="2.爬虫功能分类"></a>2.爬虫功能分类</h1><p>在进行案例之前先说明一下爬虫的功能分类，一共有如下几种</p><ul><li>通用爬虫：直接对页面的所有数据进行爬取</li><li>聚焦爬虫：对页面中的数据有选择性的爬取</li><li>功能爬虫：通过浏览器或者app实现自动化爬取</li><li>增量式爬虫：对新更新的数据进行补充爬取，以前爬取的数据不再新爬取</li><li>分布式爬虫：搭建分布式集群对网络资源进行联合且分布的爬取<br>当然本篇的案例只是很基础的案例，甚至代码都不会多</li></ul><h1 id="3-1-东方财富网"><a href="#3-1-东方财富网" class="headerlink" title="3.1 东方财富网"></a>3.1 东方财富网</h1><p>网址：<a href="https://www.eastmoney.com/">https://www.eastmoney.com/</a></p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests </span><br><span class="line">url = <span class="string">&#x27;https://www.eastmoney.com/&#x27;</span></span><br><span class="line"><span class="comment">#向指定URL进行请求，响应数据</span></span><br><span class="line">response = requests.get(url =url) </span><br><span class="line">response.encoding = <span class="string">&#x27;utf-8&#x27;</span></span><br><span class="line">page = response.text <span class="comment">#text返回的是字符串的响应数据</span></span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(<span class="string">&#x27;dongfang.html&#x27;</span>,<span class="string">&#x27;w&#x27;</span>) <span class="keyword">as</span> fp: </span><br><span class="line"><span class="comment">#如果返回还有编码问题，在open中也加个 encoding=&#x27;utf-8&#x27; </span></span><br><span class="line">fp.write(page) <span class="comment">#这里的page是上述获取的响应数据</span></span><br></pre></td></tr></table></figure><p>通过运行上方代码即可得到，下述内容的文件<br><img src="https://image-1352611653.cos.ap-guangzhou.myqcloud.com/blog/Pasted%20image%2020250414090650.png"><br>在右上角四个浏览器中选择一个进入即可看到爬取成果</p><h1 id="3-2-51游戏网"><a href="#3-2-51游戏网" class="headerlink" title="3.2 51游戏网"></a>3.2 51游戏网</h1><p>网址：<a href="https://www.51.com/">https://www.51.com/</a><br>上一个案例中，只是简单的对url的首页进行通用爬取，但事实上你进入一个网站肯定不会只因为其主页，比如这个游戏网，你若想搜集带有“王者”这个关键词的游戏仅靠先前给出代码无法实现该需求<br>此时可以先进入网页去搜索看看相关的网址会是什么样<br><img src="https://image-1352611653.cos.ap-guangzhou.myqcloud.com/img/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202025-04-14%20095515.png" alt="屏幕截图 2025-04-14 095515.png"><br>通过类似输入多个关键词，会发现url前面<a href="https://game.51.com/search/action/game/%E9%83%BD%E6%B2%A1%E6%9C%89%E6%94%B9%E5%8F%98%EF%BC%8C%E5%8F%AA%E6%9C%89%E5%90%8E%E9%9D%A2%E7%9A%84%22%E7%8E%8B%E8%80%85%22%E8%BF%99%E4%B8%AA%E5%85%B3%E9%94%AE%E8%AF%8D%E5%8F%98%E5%8C%96%E4%BA%86%EF%BC%8C%E6%89%80%E4%BB%A5%E5%AF%B9%E5%BA%94%E7%9A%84%E4%BB%A3%E7%A0%81%E4%B9%9F%E4%BC%9A%E5%AF%B9%E5%BA%94%E5%8F%98%E5%8C%96">https://game.51.com/search/action/game/都没有改变，只有后面的&quot;王者&quot;这个关键词变化了，所以对应的代码也会对应变化</a></p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests  </span><br><span class="line">  </span><br><span class="line">game_title = <span class="built_in">input</span>(<span class="string">&#x27;请输入想要搜索的关键词：&#x27;</span>)  </span><br><span class="line"><span class="comment">#存放需要的请求参数</span></span><br><span class="line">params = &#123;  </span><br><span class="line">  <span class="string">&#x27;q&#x27;</span>: game_title  </span><br><span class="line">&#125;  </span><br><span class="line">  </span><br><span class="line">url= <span class="string">&quot;https://www.51.com/&quot;</span>  </span><br><span class="line"><span class="comment">#这是搜索的网址头</span></span><br><span class="line">first_url = <span class="string">&#x27;https://game.51.com/search/action/game/&#x27;</span>  </span><br><span class="line">response = requests.get(url=first_url,params=params)  </span><br><span class="line">response.encoding = <span class="string">&#x27;utf-8&#x27;</span>  </span><br><span class="line">page_51 = response.text  </span><br><span class="line">  </span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(<span class="string">&#x27;51.html&#x27;</span>,<span class="string">&#x27;w&#x27;</span>,encoding=<span class="string">&#x27;utf-8&#x27;</span>) <span class="keyword">as</span> fp:  </span><br><span class="line">    fp.write(page_51)</span><br></pre></td></tr></table></figure><h1 id="3-3-中国人事考试网"><a href="#3-3-中国人事考试网" class="headerlink" title="3.3 中国人事考试网"></a>3.3 中国人事考试网</h1><ul><li>网址 <a href="http://www.cpta.com.cn/">http://www.cpta.com.cn/</a><br>如果你根据先前的代码去进行爬取，并不会报错，但是当你将爬取到的网址打开以后并不会得到对应网址，而是如下图的报错。<br><img src="https://image-1352611653.cos.ap-guangzhou.myqcloud.com/img/20250414103956791.png" alt="image.png"></li></ul><p>于是据此，提出一个说法，对于此类问题都是由于爬虫模拟浏览器的程度不够，网站认为我的这个id不正常，不属于正常用户访问浏览器的id所以无法进行爬取，所以，我们需要在代码中加入header，也就是请求头，你可以通过在浏览器中按F12，进入开发者模式<br><img src="https://image-1352611653.cos.ap-guangzhou.myqcloud.com/img/20250414104534207.png" alt="image.png"><br>请求标头的就是正常用户提出请求会携带的数据，而先前的代码中并没有这些，所谓的反爬机制就是这样找到你模拟不够完善的地方，然后组织爬虫代码访问，但并不是说请求头中的所有都需要填进去，多数仅需要UA和cookie就可以使得代码正常运行(对应数据按照上述图去找到复制即可)</p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests  </span><br><span class="line">url = <span class="string">&#x27;http://www.cpta.com.cn/&#x27;</span>  </span><br><span class="line">header = &#123;  </span><br><span class="line">    <span class="string">&#x27;user-agent&#x27;</span>:<span class="string">&#x27;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36&#x27;</span>  </span><br><span class="line">&#125;  </span><br><span class="line">  </span><br><span class="line">response = requests.get(url=url,headers=header)  </span><br><span class="line">response.encoding= <span class="string">&#x27;utf-8&#x27;</span>  </span><br><span class="line">page_cpta = response.text  </span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(<span class="string">&#x27;cpta.html&#x27;</span>,<span class="string">&#x27;w&#x27;</span>,encoding= <span class="string">&#x27;utf-8&#x27;</span>) <span class="keyword">as</span> f:  </span><br><span class="line">    f.write(page_cpta)</span><br></pre></td></tr></table></figure><p>当然获取的文件中可能会只包含数据，一些网站的设计排版不一定会有，但数据爬到就可以了<br>如果我们想要更进一步搜索，比如想搜“人力资源”相关的信息，肯定还需要另外的代码，在写之前可以去实际网页搜索试试，看看网址有什么关系<br><img src="https://image-1352611653.cos.ap-guangzhou.myqcloud.com/img/20250414110930404.png" alt="image.png"><br>你会发现这个页面和之前的51游戏页面有有所不同这里的网址值只有search，无论你搜什么关键词，网址都只是这个，此时你可以打开F12，查看相关信息，你会发现与之前的请求方式不同，这个页面采用的是post请求方式<br><img src="https://image-1352611653.cos.ap-guangzhou.myqcloud.com/img/20250414111517102.png" alt="image.png"><br>post数据往往会返回数据存储在json文件中，所以你应当去找对应的数据，也就是标头右边的载荷<br><img src="https://image-1352611653.cos.ap-guangzhou.myqcloud.com/img/20250414111636320.png" alt="image.png"><br>将这里的数据复制到代码中再进行爬虫就可以达成效果</p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests  </span><br><span class="line">url = <span class="string">&#x27;http://www.cpta.com.cn/category/search&#x27;</span>  </span><br><span class="line">key_word = <span class="built_in">input</span>(<span class="string">&#x27;请输入想要搜索的关键词：&#x27;</span>)  </span><br><span class="line">params = &#123;  </span><br><span class="line">  </span><br><span class="line">    <span class="string">&#x27;keywords&#x27;</span>: key_word ,  </span><br><span class="line">    <span class="string">&#x27;搜 索&#x27;</span>: <span class="string">&#x27;搜 索&#x27;</span>  </span><br><span class="line">&#125;  </span><br><span class="line">header = &#123;  </span><br><span class="line"><span class="string">&#x27;user-agent&#x27;</span>: <span class="string">&#x27;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36&#x27;</span>,  </span><br><span class="line">&#125;  </span><br><span class="line">response = requests.post(url= url,headers=header, params=params)  </span><br><span class="line">response.encoding=<span class="string">&#x27;utf=8&#x27;</span>  </span><br><span class="line">page_cpta = response.text  </span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(<span class="string">&#x27;cpta_search.html&#x27;</span>,<span class="string">&#x27;w&#x27;</span>,encoding=<span class="string">&#x27;utf-8&#x27;</span>) <span class="keyword">as</span> f:  </span><br><span class="line">    f.write(page_cpta)</span><br></pre></td></tr></table></figure><h1 id="4-KFC餐厅"><a href="#4-KFC餐厅" class="headerlink" title="4. KFC餐厅"></a>4. KFC餐厅</h1><ul><li>网址：<a href="http://www.kfc.com.cn/kfccda/storelist/index.aspx">http://www.kfc.com.cn/kfccda/storelist/index.aspx</a><br>在这里你若是想要通过关键词去进行查询你会发现，它并不会挑跳转到新网址，但是你若是按原本网址来却只能获取到无搜索时的数据。<br>这是因为在页面数据中有一种数据名为动态数据，动态加载数据值不是直接通过浏览器地址栏的url请求到的数据，这些数据叫做动态加载数据。<br>那么怎么判别数据是否是动态数据呢？你可以通过开发者模式，进入到当前页面的network<br><img src="https://image-1352611653.cos.ap-guangzhou.myqcloud.com/img/20250414120018745.png" alt="image.png"><br>查找窗口可以通过ctrl+f 进行呼出，输入关键词，然后在响应中去搜索关键词看看是否能找到对应的数据，若无贼说明是动态数据<br>可以通过动态数据左上角的全局搜索进行找到对应文件<br><img src="https://image-1352611653.cos.ap-guangzhou.myqcloud.com/img/20250414120958787.png" alt="image.png"><br>动态数据往往会用json存储，所以写代码的时候得留意，并且数据往往不止一页，有多页，需要采取多页连续采取<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests  </span><br><span class="line">key_word = <span class="built_in">input</span>(<span class="string">&#x27;请输入关键词:&#x27;</span>)  </span><br><span class="line">page_input = <span class="built_in">input</span>(<span class="string">&#x27;请输入页码(如1-5或1,2,3)：&#x27;</span>)  </span><br><span class="line">  </span><br><span class="line">pages=[]  </span><br><span class="line"><span class="keyword">if</span> <span class="string">&#x27;-&#x27;</span> <span class="keyword">in</span> page_input:  </span><br><span class="line">    start,end = <span class="built_in">map</span>(<span class="built_in">int</span>, page_input.split(<span class="string">&#x27;-&#x27;</span>))  </span><br><span class="line">    pages= <span class="built_in">list</span>(<span class="built_in">range</span>(start, end+<span class="number">1</span>))  </span><br><span class="line"><span class="keyword">else</span>:  </span><br><span class="line">    pages = [<span class="built_in">int</span>(page_input)]  </span><br><span class="line">  </span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(<span class="string">&#x27;kfc1.txt&#x27;</span>,<span class="string">&#x27;w&#x27;</span>,encoding=<span class="string">&#x27;utf-8&#x27;</span>) <span class="keyword">as</span> f:  </span><br><span class="line">    f.write(<span class="string">&quot;门店名称\t地址\n&quot;</span>)  <span class="comment"># 写入表头  </span></span><br><span class="line">    <span class="keyword">for</span> page <span class="keyword">in</span> pages:  </span><br><span class="line">        url = <span class="string">&#x27;http://www.kfc.com.cn/kfccda/ashx/GetStoreList.ashx?op=keyword&#x27;</span>  </span><br><span class="line">        header = &#123;  </span><br><span class="line">        <span class="string">&#x27;user-agent&#x27;</span>: <span class="string">&#x27;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36&#x27;</span>  </span><br><span class="line">        &#125;  </span><br><span class="line">        data = &#123;  </span><br><span class="line">            <span class="string">&#x27;cname&#x27;</span>:<span class="string">&#x27;&#x27;</span> ,  </span><br><span class="line">             <span class="string">&#x27;pid&#x27;</span>: <span class="string">&#x27;&#x27;</span>,  </span><br><span class="line">            <span class="string">&#x27;keyword&#x27;</span>: key_word,  </span><br><span class="line">            <span class="string">&#x27;pageIndex&#x27;</span>: page,  </span><br><span class="line">            <span class="string">&#x27;pageSize&#x27;</span>: <span class="string">&#x27;10&#x27;</span>  </span><br><span class="line">        &#125;  </span><br><span class="line">  </span><br><span class="line">        response = requests.post(url=url,headers=header,data=data)  </span><br><span class="line">        response.encoding= <span class="string">&#x27;utf-8&#x27;</span>  </span><br><span class="line">        page_KFC = response.json()  </span><br><span class="line">  </span><br><span class="line">        <span class="keyword">for</span> detail <span class="keyword">in</span> page_KFC[<span class="string">&#x27;Table1&#x27;</span>]:  </span><br><span class="line">            storename = detail.get(<span class="string">&#x27;storeName&#x27;</span>, <span class="string">&#x27;N/A&#x27;</span>)  </span><br><span class="line">            add = detail.get(<span class="string">&#x27;addressDetail&#x27;</span>, <span class="string">&#x27;N/A&#x27;</span>)  </span><br><span class="line">            f.write(<span class="string">f&quot;<span class="subst">&#123;storename&#125;</span>\t<span class="subst">&#123;add&#125;</span>\n&quot;</span>)  </span><br><span class="line">            <span class="built_in">print</span>(<span class="string">f&quot;成功保存：<span class="subst">&#123;storename&#125;</span>-<span class="subst">&#123;add&#125;</span>&quot;</span>)</span><br></pre></td></tr></table></figure></li></ul>]]></content>
+      
+      
+      
+    </entry>
+    
+    
+  
+  
+    
+    
+    <entry>
+      <title></title>
+      <link href="/css/custom.css"/>
+      <url>/css/custom.css</url>
+      
+        <content type="html"><![CDATA[/* 导航栏模块 *//* 一级菜单居中 */#nav .menus_items {    position: absolute !important;    width: fit-content !important;    left: 50% !important;    transform: translateX(-50%) !important;    font-size: 25px !important; /* 独立于全局字体 */      }/* 子菜单横向展示 */#nav .menus_items .menus_item:hover .menus_item_child {    display: row !important;}/* 这里的2是代表导航栏的第2个元素，即有子菜单的元素，可以按自己需求修改 */.menus_items .menus_item:nth-child(5) .menus_item_child {    left: -50px;}/* 背景的通明度模块 *//* 文章页背景 */.layout_post>#post {    /* 以下代表透明度为0.7 可以自行修改*/    background: rgba(255,255,255,.9);} /* 所有页面背景 */#aside_content .card-widget, #recent-posts>.recent-post-item, .layout_page>div:first-child:not(.recent-posts), .layout_post>#page, .layout_post>#post, .read-mode .layout_post>#post{    /* 以下代表透明度为0.7 */    background: rgba(255,255,255,.9);    border:2px solid #0ff5ff;    box-shadow: 1px 1px 10px #0ff5ff; }/* 侧边卡片的透明度 */:root {  --card-bg: rgba(255, 255, 255, .9);}/* 页脚透明 */#footer {/* 以下代表透明度为0.7 */background: rgba(255,255,255, .0);} :root {    --global-font-size: 20px;}.aplayer .aplayer-list ol li.aplayer-list-light, .aplayer, #aside_content .card-widget, #recent-posts>.recent-post-item, .layout>div:first-child:not(.recent-posts), .layout_post>#page, .layout_post>#post, .read-mode .layout_post>#post{    /* ä»¥ä¸‹ä»£è¡¨ç™½è‰²é€æ˜Žåº¦ä¸º0.3 */    background: rgba(255, 255, 255, 0.9);    border:2px solid #0ff5ff;    box-shadow: 1px 1px 10px #0ff5ff;}   .recent-post-item{    background: rgba(255, 255, 255, 0.9);    border:2px solid #0ff5ff;    box-shadow: 1px 1px 10px #0fffc3;}]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>关于我</title>
+      <link href="/about/index.html"/>
+      <url>/about/index.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title></title>
+      <link href="/css/transpancy.css"/>
+      <url>/css/transpancy.css</url>
+      
+        <content type="html"><![CDATA[/* 1. 容器对齐与间距 */.layout>div:first-child:not(.recent-posts) {    -webkit-align-self: flex-start;    align-self: flex-start;    -ms-flex-item-align: start;    padding: 50px 40px;}/* 2. 侧边栏卡片宽度控制 */#aside-content #card-toc .toc-content {    width: 340px;}#aside-content #card-toc .toc-content .toc-link {    font-size: 16px;}#aside-content .card-announcement .item-headline i {    color: rgb(53, 183, 41);}/*è¿™é‡Œæ”¾å¤–æ¡†*//* body{    cursor:url(https://cdn.custom-cursor.com/db/5006/32/arrow2836.png) , default!important;    }    /*è¿™é‡Œæ”¾å†…æ¡†*//* a,img,button{    cursor: url(https://cdn.custom-cursor.com/db/5005/32/arrow2836.png) , pointer !important;    } */ */ .aplayer .aplayer-list ol li.aplayer-list-light, .aplayer, #aside_content .card-widget, .layout>div:first-child:not(.recent-posts), .layout_post>#page, .layout_post>#post, .read-mode .layout_post>#post{    /* ä»¥ä¸‹ä»£è¡¨ç™½è‰²é€æ˜Žåº¦ä¸º0.3 */    background: rgba(255, 255, 255, 0.9);    border:2px solid #0ff5ff;    box-shadow: 1px 1px 10px #0ff5ff;}/* 目录子元素样式​ */toc-child {    font-size: 10px;}/* 1. 背景与整体布局 */#post .post-copyright {    background: rgba(231, 252, 253, 0.9);}/* 元数据样式 */#post .post-copyright .post-copyright-meta {    color: #21597d;    font-weight: bold;}/* 正文内容样式 */#post .post-copyright .post-copyright-info {    padding-left: 6px;    color: #5274ba;}/* 4. 链接样式 */#post .post-copyright .post-copyright-info a {    padding-left: 6px;    color: #4b8de8}/* 页面容器样式​ */#git_container,#archive,#page {    background: rgba(214, 242, 244, 0.8);    /* 半透明浅蓝背景 */    border: 2px solid #0ff5ff !important;    /* 青色边框 */    box-shadow: 1px 1px 20px #0ff5ff !important;    /* 浅蓝投影 */}/* ​​卡片组件样式 */.card-widget {    border: 2px solid #3d0f3f00 !important;    /* 透明深灰边框 */    box-shadow: 1px 1px 20px #c4e8fc !important;    /* 浅蓝投影 */    --font-color: #2e8086;    /* 定义字体色变量 */    --text-highlight-color: #110101;    /* 定义高亮色变量 */}/* 暗色模式适配​ */[data-theme='dark'] {    --font-color: black;    --text-highlight-color: #fdeacc;}标题样式​ #subtitle,#site-title {    color: #ffffff !important;}.layout_page>div:first-child:not(.recent-posts),.layout_post>#page,.layout_post>#post,.read-mode .layout_post>#post {    background: var(--light_bg_color)}#aside-content .card-info .author-info__name {    font-weight: 500;    font-size: 2.57em;    color: #ffffff;}/* ç®€ä»‹ */#aside-content .card-info .author-info__description {    margin-top: -0.42em;    font-size: 1.30em;    color: #000000;}/* 边栏文章等 */.site-data>a .headline {    font-size: 20px;    color: #21597d;}/* 边栏文章等的数字 */.site-data>a .length-num {    margin-top: -0.32em;    color: var(--text-highlight-color);    font-size: 1.4em;}/* å¾®ä¿¡ */#aside-content .card-widget.card-announcement {    background-color: #a2d1b2;}/* ç›®å½• */#aside-content #card-toc {    background-color: #f5e9eb;}/* æœ€è¿‘æ–‡ç«  */#aside-content .card-widget.card-recent-post {    background-color: #e2ebda;}/* ç½‘ç«™ä¿¡æ¯ */#aside-content .card-widget.card-webinfo {    background-color: #c7c7c6;}/* å¾®åšä¿¡æ¯ */#weibo.card-widget {    background: linear-gradient(to right, #ff5f6d, #ffc371);    /* æ·»åŠ å…¶ä»–æ ·å¼ */    border-radius: 10px;    color: #0ff5ff ;    border-width: 10px;}@-webkit-keyframes Gradient {    0% {        background-position: 0% 50%;    }    50% {        background-position: 100% 50%;    }    100% {        background-position: 0% 50%;    }}@-moz-keyframes Gradient {    0% {        background-position: 0% 50%;    }    50% {        background-position: 100% 50%;    }    100% {        background-position: 0% 50%;    }}@keyframes Gradient {    0% {        background-position: 0% 50%;    }    50% {        background-position: 100% 50%;    }    100% {        background-position: 0% 50%;    }}/* ä¸ªäººä¿¡æ¯Follow meæŒ‰é’® */#aside-content>.card-widget.card-info>#card-info-btn {    background-color: #3eb8be;    border-radius: 8px;}/* æ³¢æµª *//* æ³¢æµªcss */.main-hero-waves-area {    width: 100%;    position: absolute;    left: 0;    bottom: -11px;    z-index: 5;}.waves-area .waves-svg {    width: 100%;    height: 5rem;}/* Animation */.parallax>use {    animation: move-forever 25s cubic-bezier(0.55, 0.5, 0.45, 0.5) infinite;}.parallax>use:nth-child(1) {    animation-delay: -2s;    animation-duration: 7s;    fill: #f7f9febd;}.parallax>use:nth-child(2) {    animation-delay: -3s;    animation-duration: 10s;    fill: #f7f9fe82;}.parallax>use:nth-child(3) {    animation-delay: -4s;    animation-duration: 13s;    fill: #f7f9fe36;}.parallax>use:nth-child(4) {    animation-delay: -5s;    animation-duration: 20s;    fill: #f7f9fe;}/* é»‘è‰²æ¨¡å¼èƒŒæ™¯ */[data-theme="dark"] .parallax>use:nth-child(1) {    animation-delay: -2s;    animation-duration: 7s;    fill: #18171dc8;}[data-theme="dark"] .parallax>use:nth-child(2) {    animation-delay: -3s;    animation-duration: 10s;    fill: #18171d80;}[data-theme="dark"] .parallax>use:nth-child(3) {    animation-delay: -4s;    animation-duration: 13s;    fill: #18171d3e;}[data-theme="dark"] .parallax>use:nth-child(4) {    animation-delay: -5s;    animation-duration: 20s;    fill: #18171d;}/* 1. 波浪动画 */@keyframes move-forever {    0% {        transform: translate3d(-90px, 0, 0);    }    100% {        transform: translate3d(85px, 0, 0);    }}/*Shrinking for mobile*/@media (max-width: 768px) {    .waves-area .waves-svg {        height: 40px;        min-height: 40px;    }}]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>音乐</title>
+      <link href="/music/index.html"/>
+      <url>/music/index.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>电影</title>
+      <link href="/movies/index.html"/>
+      <url>/movies/index.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>友情链接</title>
+      <link href="/link/index.html"/>
+      <url>/link/index.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>小说</title>
+      <link href="/novels/index.html"/>
+      <url>/novels/index.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>tags</title>
+      <link href="/tags/index.html"/>
+      <url>/tags/index.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>隐藏在时光里的回忆</title>
+      <link href="/%E5%9B%9E%E5%BF%86/index.html"/>
+      <url>/%E5%9B%9E%E5%BF%86/index.html</url>
+      
+        <content type="html"><![CDATA[<h1 id="序-回忆璀璨如花"><a href="#序-回忆璀璨如花" class="headerlink" title="序 回忆璀璨如花"></a><strong>序 回忆璀璨如花</strong></h1><p>嵊县的秋季格外凉爽，兴许是军训的后遗症，又或许是因为全球变暖让楚宇这颗心系世和平的心莫名的烦躁，趁老师不注意，趴在桌子上百无聊赖地望着窗外一片一片下落的银杏。</p><p>还没多看几眼便被一旁的男生用笔戳了戳腰，</p><p>“别发呆了，我看君姐已经瞥了你好几眼了，你是真喜欢上她办公室的龙井了？”</p><p>楚宇稍微起了起身子，给同桌翻了个白眼，露出手肘下面的翻在《荷塘月色》一面的语文书，</p><p>“啧，我这可不叫发呆，我只是在体会朱自清先生‘什么都可以想，什么都可以不想’的意境！还有，你这个开学没多久就因为上课看小说跟老师混熟的也没资格说我吧。”</p><p>说罢，楚宇还翘起嘴巴，用下巴点了点同桌本子下藏着的《花火》。</p><p>“但我成绩全班前三。”面对楚宇的挑衅，其同桌轻描淡写地答道。</p><p>楚宇忍住想要怒拍桌子的手，声音低沉地抗议，“难道成绩好就可以为所欲为吗!气抖冷，学渣什么时候才能站起来！”</p><p>同桌翻了翻白眼，道：“呵，站起来也给你腿打折，而且，成绩好确实可以为所欲为。”</p><p>楚宇刚要开口怼回去，就听得讲台上一阵河东狮吼传过：“楚宇，江耿给我站起来！楚宇，你来回答荷塘月色一共分为几部分，分别用几幅图来概括各部分内容。</p><p>楚宇回答不出来，江耿接着，要是都不会，这节课就站着吧。”</p><p>这两同桌一个发呆，一个看小说，最终结果自然是全军覆没。</p><p>当君姐重新开始上课时，两人不约而同的侧向对方，骂道：</p><p>“还不都是因为你！”</p><p>“还不都是因为你！”</p><p>……..</p><p>“向前跑！</p><p>迎着眼泪和嘲笑，</p><p>生命的广阔不经历风雨怎能感到…….”</p><p>一阵手机铃声将楚宇从睡梦中惊醒，楚宇左脚一踹，碰到守株待兔的墙壁，顿时缩进被窝里裹成史莱姆状，捂着脚指头瑟瑟发抖，将刚刚响铃抛之脑后。</p><p>但是电话铃却是不肯停歇，没一会又响了起来。</p><p>史莱姆状的被窝先是沉寂几秒钟，然后被色史莱姆缓缓向床头蠕动，伸出一只手，摸到床头的手机，看了看联系人，不耐烦地接到：“喂，徐正言！不知道放假人，人上人，扰人清梦可是大忌啊！”</p><p>“……”电话那先是一阵沉默，随即传来一阵怒吼，“你是不是忘了今天还要回学校！再不过来，老张就要来亲自问候您了！”</p><p>本还在撞墙以及起床气双重debuff中的楚宇听到“老张”二字突然清醒，瞥了一眼手机上的时间日期，顾不得留恋温暖的被窝，毫无形象地从床上爬起。</p><p>…………</p><p>紧赶慢赶，当楚宇冲进教室时，老张似乎还没到，同学们三三两两地坐一块，毕竟也算是高中毕业了，多数人都是把手机带来了。有王者开黑的，有聚在一块插科打诨的，嗯，也有刚毕业就斥巨资买了个索尼新款耳机然后就整天机不离手不知道搁那听啥的憨憨。</p><p>楚宇径直地走向自己座位，把同桌的耳机摘了下来，戴到了自己耳朵上，听着耳机中传来林肯公园的《In The End》，向徐正言问道：</p><p>“老张有没有来过？毕业典礼啥时候开始啊？”</p><p>兴许是对楚宇拿耳机的不爽，楚宇面对徐正言故意光张嘴不说话的幼稚行为，大声回怼：</p><p>“你刚电话里不说的顶凶？现在见面了不敢说话了？”</p><p>徐正言显然是不知道楚宇会这么回答，先是一怔，然后一把把耳机从楚宇头上摘下，</p><p>“他喵的你带着降噪耳机跟我说话你是想咋样啊喂，还我不敢说话，你怎么这么能啊！我……”</p><p>还没等徐正言骂完，班主任张德新出现在门口，走进教室，不得不说即使毕业了，班主任的威严是丝毫不减，班里瞬间鸦雀无声，玩手机的也不自觉的把手机藏了藏。徐正言白了楚宇一眼，也正了正身子。</p><p>“今天的流程十分简短，等你们听完毕业典礼，回来自己整完书就可以回去了。</p><p>去之前让我再唠叨几句，高考前，总是抓着你们念，高考是你们转折点，反复提醒，显得高考失败人生都输了似的，</p><p>现在肯定不会这么说，哪怕你高考失利，大学只要加把劲，考研也能考一个好学校……”</p><p>老班这段透着“主要唠叨会随当前情境改变”变相劝学的言论，不由得引起同学们的轻笑。</p><p>楚宇也放松起来，身子趴在桌上，看着讲台上还在念叨的老班，好笑又有些伤感的想到，</p><p>“都毕业了还是不忘催我们去学习啊。”</p><p>开学典礼，学生大会，结业典礼……三年来在学校参加的数不胜数的会典都是大同小异，校长演讲，表扬，鸡汤等等。无论是经历过学生时代，还是正处于青春对此想必都耳熟能详。</p><p>许是老张难得没敷衍我们，典礼流程确实简短，也有可能是有着手机打发时间，转眼间典礼就结束了，同学们闹哄哄地跑向教室，边跑边跟着一旁的同学吐槽，</p><p>“学校？我可是不能多待一秒！冲冲冲！”</p><p>徐正言也是手脚利落，三下五除二便把书整理好，见楚宇坐在位置上看着手机发呆，用力拍了一下楚宇的背，顺势将头一伸，</p><p>“跟哪个妹纸聊天呢？书都还没整完？”</p><p>但显然是楚宇熄屏键按得更快，待徐正言定睛看清，只能看到黑屏上倒映的自己。</p><p>楚宇没好气地说道：“就你整天爱吃瓜，我哪像你这么不爱学习书这么少，我爸妈还没到呢，咱整完书也没地放。”</p><p>徐正言对这种高考完一点书不整直接奔回家，现在还如此理直气壮的行为不做表示，向楚宇挥了挥手，留下句，“暑假聚”，转身离去，只给楚宇留下个后脑勺。</p><p>过了没多久，楚宇趁着父母没到，带着早上匆忙拿来的袋子也走出了教室。</p><p>…………</p><p>窗外树影婆娑，木槿摇曳，朦胧的月色星光不知被何人碾碎，织起一浣轻纱，平铺在天空之中。</p><p>夏日的夜晚仍是可以清凉的，楚宇坐在书桌前，感受着一阵阵微风拂来，看着桌上的日记本。</p><p>这是楚宇下午整理出来的，刚翻出来时，它混杂在一堆教科书作业本中，虽然高考前三个月完全忘记了日记这回事，将其埋没于书海中，1但意外地没有褶皱，安静地躺着，像是隐藏在时光中似的。</p><p>花了几个小时把整本日记浏览了一遍，然后在开头故意留出的空白的一页提笔写下，</p><p>回忆璀璨如花</p><h1 id="第一章"><a href="#第一章" class="headerlink" title="第一章"></a><strong>第一章</strong></h1><p>八月末的阳光格外的毒辣，原本清凉的早晨的微风也带着一丝燥热，几只飞鸟路过，穿过如今已愈发少见的喷气式飞机留下的痕迹，此时知了的精力最是旺盛，阳光透过树叶形成斑驳的小圆影，打在鸣叫的知了上，宛若为其穿上了新衣。</p><p>原本安逸的校园因为一些“不速之客”打破了此时祥和的氛围。</p><p>“砰！”</p><p>楚宇用自己的身体将虚掩着的门撞开，灰尘扬起，在阳光的照射下格外显眼，如同精灵般飞舞着。</p><p>拿着大包小包的楚宇平复着略微有点喘的呼吸，心里念叨着，</p><p>“嘁，出师不利，七点多就来学校不说，刚入学就让我爬六楼给我来个下马威是吧，以后放学已经不想回寝室了。”</p><p>若是能回到前一天晚上，他一定会把那个义正严词地拒绝了母亲想要来帮忙搬运行李的请求，拍着胸脯发誓一个人也能搞定的自己打一顿，然后哭求妈妈再爱我一次。</p><p>当然这些臆想也就一闪而过，毕竟还有一堆行李要整，他回过神仔细环顾了四周，将自己未来几年居住的寝室布局纳入眼帘：</p><p>抬头正对门的便是卫生间，储物柜在入门左手，兴许因为是c形楼最边上的寝室，与先前瞥到的别的寝室床、柜子、卫生间堆挤在一个房间的布局不同，楚宇寝室的储物柜与卫生间独立在一个隔间，右手的过道穿过个约一人半长宽的门形口子才到摆放着几张双人床的“住宿区”，过道的尽头便是阳台。</p><p>楚宇粗略地扫了一眼过道，虽然寝室许久没有人，但看起来还是蛮干净的。先前自己还担忧得废些力气才能打扫完工。</p><p>待楚宇拖着行李箱以及装着被褥的寝室袋进去寝室，才发现寝室这么干净是有原因的——有位男生在阳台死角上，似是听到动静，正好冒出个头，望向楚宇。</p><p>阳台的窗户开着，一阵微风拂过，吹起男生的碎发，那位男生似是双腿一蹬，楚宇便看到男生“咕噜，咕噜”的坐着行李箱划了出来，他从行李箱小跳了下来，面带微笑地走过来帮忙拿行李，说道：</p><p>“你也是601的吧？我叫江耿，将来几年就好好相处喽！”</p><p>“谢谢帮忙，额……我叫楚宇。”楚宇表面上没有异样，但心里完全任由吐槽本能爆发。</p><p>“啧啧，可恶啊，热情开朗还长得小帅，妥妥的人生赢家模板啊，唯一的不足是身高似乎只有170出头，嗯比我矮好些。”</p><p>楚宇自然也知道身高的比较只是毫无意义的逞强，但是男人的迷之胜负欲就是如此，孔子都说三人行必有我师，自己总得有些比得过人家的方面是吧。</p><p>虽说楚宇思绪越飘越远，但手上没闲着，找到自己靠阳台侧上铺的床位，将一些行李放在上面。</p><p>说来也巧，另一旁的上铺的被褥也已经整理好了，不用多想也能猜到这就是那位江耿同学的床位。</p><p>兴许是江耿在阳台的活也干完了，他并没有回阳台继续捣鼓，而是打开行李箱整理衣服。楚宇也开始了整理被褥、铺床，短短几分钟，601寝室便出现了安静—热闹—寂静的不同氛围，没错，你没看错就是寂静，若是江耿继续回阳台干活，楚宇倒也不会怎么样，但当其也在“住宿区”整理时，两者皆不说话的氛围就让楚宇有些待不住了，感觉气氛一度凝固。当楚宇快忍不住，准备找些垃圾话活跃活跃气氛时，江耿也发话了：</p><p>“学校规定的是九点半到校吧，这才七点出头，你为什么来的这么早？要不是尚东那的公交车来城里只有六点多的，我现在还睡着呢！”</p><p>闻言，楚宇也是暗松了口气，在听到江耿是尚东的后，也了然原因，楚宇父亲也是尚东镇的，偶尔自驾来回一趟便要花费不少时间，更别说是坐城乡公交车了，导致平日里那边公交车的排班确实不多。楚宇没放下手中的工作，边整理边回答：</p><p>“”</p>]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>醉欢行</title>
+      <link href="/%E9%86%89%E6%AC%A2%E8%A1%8C/index.html"/>
+      <url>/%E9%86%89%E6%AC%A2%E8%A1%8C/index.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+  
 </search>
