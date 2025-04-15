@@ -65,36 +65,7 @@
 
 
 
-/* 3. 主容器布局 */
-.layout {
-    display: flex;
-    gap: 15px; /* 控制 content 和 aside 的间距 */
-    padding: 50px 0 50px 100px; /* 头部高度 + 左边距 100px */
-    margin-left: 100px; /* 整体左边界距离页面左边界 100px */
-    margin-right: 100px; /* 整体右边界距离页面右边界 100px */
-    min-height: calc(100vh - 200px); /* 减去头部高度 */
-  }
-  
-  /* 4. content-inner 变宽 */
-  #content-inner {
-    flex: 1; /* 占据剩余空间 */
-    max-width: calc(100% - 300px); /* 防止挤压 aside */
-   
-  }
-  
-  /* 5. recent-posts 变宽 */
-  #recentposts {
-    width: 100%; /* 占满父容器宽度 */
-    margin-left: 5px; /* 与 content 左边界间距 */
-    
-  }
-  
-  /* 6. 侧边栏固定宽度 */
-  .aside-content {
-    width: 300px; /* 固定宽度 */
-    margin-left: 10px; /* 与 recentposts 的间距 */
-    
-  }
+
   
  .recent-post-item{
 
