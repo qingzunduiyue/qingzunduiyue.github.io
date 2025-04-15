@@ -4,41 +4,21 @@
     <title>python爬虫学习（一）</title>
     <url>/2025/04/13/python%E7%88%AC%E8%99%AB/</url>
     <content><![CDATA[1.前言本篇开始想要从基础的爬虫案例开始，逐步完成爬虫相关技术的学习，在本篇中，我会用东方财富 、51游戏、中国人事考试网等案例进行，从易到难。
-2.爬虫功能分类
-在进行案例之前先说明一下爬虫的功能分类，一共有如下几种  通用爬虫：直接对页面的所有数据进行爬取  聚焦爬虫：对页面中的数据有选择性的爬取  功能爬虫：通过浏览器或者app实现自动化爬取  增量式爬虫：对新更新的数据进行补充爬取，以前爬取的数据不再新爬取  分布式爬虫：搭建分布式集群对网络资源进行联合且分布的爬取
-当然本篇的案例只是很基础的案例，甚至代码都不会多
+2.爬虫功能分类在进行案例之前先说明一下爬虫的功能分类，一共有如下几种    通用爬虫：直接对页面的所有数据进行爬取    聚焦爬虫：对页面中的数据有选择性的爬取    功能爬虫：通过浏览器或者app实现自动化爬取    增量式爬虫：对新更新的数据进行补充爬取，以前爬取的数据不再新爬取    分布式爬虫：搭建分布式集群对网络资源进行联合且分布的爬取当然本篇的案例只是很基础的案例，甚至代码都不会多
+3.1 东方财富网网址：https://www.eastmoney.com/
+import requests url = &#x27;https://www.eastmoney.com/&#x27;#向指定URL进行请求，响应数据response = requests.get(url =url) response.encoding = &#x27;utf-8&#x27;page = response.text #text返回的是字符串的响应数据with open(&#x27;dongfang.html&#x27;,&#x27;w&#x27;) as fp: #如果返回还有编码问题，在open中也加个 encoding=&#x27;utf-8&#x27; 	fp.write(page) #这里的page是上述获取的响应数据
+通过运行上方代码即可得到，下述内容的文件在右上角四个浏览器中选择一个进入即可看到爬取成果
+3.2 51游戏网网址：https://www.51.com/
 
-3.1 东方财富网
-网址：https://www.eastmoney.com/import requests url = &#x27;https://www.eastmoney.com/&#x27;#向指定URL进行请求，响应数据response = requests.get(url =url) response.encoding = &#x27;utf-8&#x27;page = response.text #text返回的是字符串的响应数据with open(&#x27;dongfang.html&#x27;,&#x27;w&#x27;) as fp: #如果返回还有编码问题，在open中也加个 encoding=&#x27;utf-8&#x27; 	fp.write(page) #这里的page是上述获取的响应数据
-通过运行上方代码即可得到，下述内容的文件
-在右上角四个浏览器中选择一个进入即可看到爬取成果
-
-3.2 51游戏网
-网址：https://www.51.com/
-上一个案例中，只是简单的对url的首页进行通用爬取，但事实上你进入一个网站肯定不会只因为其主页，比如这个游戏网，你若想搜集带有“王者”这个关键词的游戏仅靠先前给出代码无法实现该需求
-此时可以先进入网页去搜索看看相关的网址会是什么样
-通过类似输入多个关键词，会发现url前面https://game.51.com/search/action/game/都没有改变，只有后面的&quot;王者&quot;这个关键词变化了，所以对应的代码也会对应变化import requests    game_title = input(&#x27;请输入想要搜索的关键词：&#x27;)  #存放需要的请求参数params = &#123;    &#x27;q&#x27;: game_title  &#125;    url= &quot;https://www.51.com/&quot;  #这是搜索的网址头first_url = &#x27;https://game.51.com/search/action/game/&#x27;  response = requests.get(url=first_url,params=params)  response.encoding = &#x27;utf-8&#x27;  page_51 = response.text    with open(&#x27;51.html&#x27;,&#x27;w&#x27;,encoding=&#x27;utf-8&#x27;) as fp:      fp.write(page_51)
+上一个案例中，只是简单的对url的首页进行通用爬取，但事实上你进入一个网站肯定不会只因为其主页，比如这个游戏网，你若想搜集带有“王者”这个关键词的游戏仅靠先前给出代码无法实现该需求此时可以先进入网页去搜索看看相关的网址会是什么样通过类似输入多个关键词，会发现url前面https://game.51.com/search/action/game/都没有改变，只有后面的&quot;王者&quot;这个关键词变化了，所以对应的代码也会对应变化import requests    game_title = input(&#x27;请输入想要搜索的关键词：&#x27;)  #存放需要的请求参数params = &#123;    &#x27;q&#x27;: game_title  &#125;    url= &quot;https://www.51.com/&quot;  #这是搜索的网址头first_url = &#x27;https://game.51.com/search/action/game/&#x27;  response = requests.get(url=first_url,params=params)  response.encoding = &#x27;utf-8&#x27;  page_51 = response.text    with open(&#x27;51.html&#x27;,&#x27;w&#x27;,encoding=&#x27;utf-8&#x27;) as fp:      fp.write(page_51)
 
 3.3 中国人事考试网
-网址 http://www.cpta.com.cn/
+网址 http://www.cpta.com.cn/如果你根据先前的代码去进行爬取，并不会报错，但是当你将爬取到的网址打开以后并不会得到对应网址，而是如下图的报错。
 
-如果你根据先前的代码去进行爬取，并不会报错，但是当你将爬取到的网址打开以后并不会得到对应网址，而是如下图的报错。
-
-于是据此，提出一个说法，对于此类问题都是由于爬虫模拟浏览器的程度不够，网站认为我的这个id不正常，不属于正常用户访问浏览器的id所以无法进行爬取，所以，我们需要在代码中加入header，也就是请求头，你可以通过在浏览器中按F12，进入开发者模式-
-
-请求标头的就是正常用户提出请求会携带的数据，而先前的代码中并没有这些，所谓的反爬机制就是这样找到你模拟不够完善的地方，然后组织爬虫代码访问，但并不是说请求头中的所有都需要填进去，多数仅需要UA和cookie就可以使得代码正常运行(对应数据按照上述图去找到复制即可)
+于是据此，提出一个说法，对于此类问题都是由于爬虫模拟浏览器的程度不够，网站认为我的这个id不正常，不属于正常用户访问浏览器的id所以无法进行爬取，所以，我们需要在代码中加入header，也就是请求头，你可以通过在浏览器中按F12，进入开发者模式请求标头的就是正常用户提出请求会携带的数据，而先前的代码中并没有这些，所谓的反爬机制就是这样找到你模拟不够完善的地方，然后组织爬虫代码访问，但并不是说请求头中的所有都需要填进去，多数仅需要UA和cookie就可以使得代码正常运行(对应数据按照上述图去找到复制即可)
 import requests  url = &#x27;http://www.cpta.com.cn/&#x27;  header = &#123;      &#x27;user-agent&#x27;:&#x27;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36&#x27;  &#125;    response = requests.get(url=url,headers=header)  response.encoding= &#x27;utf-8&#x27;  page_cpta = response.text  with open(&#x27;cpta.html&#x27;,&#x27;w&#x27;,encoding= &#x27;utf-8&#x27;) as f:      f.write(page_cpta)
-当然获取的文件中可能会只包含数据，一些网站的设计排版不一定会有，但数据爬到就可以了
-
-如果我们想要更进一步搜索，比如想搜“人力资源”相关的信息，肯定还需要另外的代码，在写之前可以去实际网页搜索试试，看看网址有什么关系
-
-你会发现这个页面和之前的51游戏页面有有所不同这里的网址值只有search，无论你搜什么关键词，网址都只是这个，此时你可以打开F12，查看相关信息，你会发现与之前的请求方式不同，这个页面采用的是post请求方式
-
-post数据往往会返回数据存储在json文件中，所以你应当去找对应的数据，也就是标头右边的载荷
-
-将这里的数据复制到代码中再进行爬虫就可以达成效果
+当然获取的文件中可能会只包含数据，一些网站的设计排版不一定会有，但数据爬到就可以了如果我们想要更进一步搜索，比如想搜“人力资源”相关的信息，肯定还需要另外的代码，在写之前可以去实际网页搜索试试，看看网址有什么关系你会发现这个页面和之前的51游戏页面有有所不同这里的网址值只有search，无论你搜什么关键词，网址都只是这个，此时你可以打开F12，查看相关信息，你会发现与之前的请求方式不同，这个页面采用的是post请求方式post数据往往会返回数据存储在json文件中，所以你应当去找对应的数据，也就是标头右边的载荷将这里的数据复制到代码中再进行爬虫就可以达成效果
 import requests  url = &#x27;http://www.cpta.com.cn/category/search&#x27;  key_word = input(&#x27;请输入想要搜索的关键词：&#x27;)  params = &#123;        &#x27;keywords&#x27;: key_word ,      &#x27;搜 索&#x27;: &#x27;搜 索&#x27;  &#125;  header = &#123;  &#x27;user-agent&#x27;: &#x27;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36&#x27;,  &#125;  response = requests.post(url= url,headers=header, params=params)  response.encoding=&#x27;utf=8&#x27;  page_cpta = response.text  with open(&#x27;cpta_search.html&#x27;,&#x27;w&#x27;,encoding=&#x27;utf-8&#x27;) as f:      f.write(page_cpta)
-
 4. KFC餐厅
 网址：http://www.kfc.com.cn/kfccda/storelist/index.aspx
 在这里你若是想要通过关键词去进行查询你会发现，它并不会挑跳转到新网址，但是你若是按原本网址来却只能获取到无搜索时的数据。
@@ -48,6 +28,12 @@ import requests  url = &#x27;http://www.cpta.com.cn/category/search&#x27;  key_w
 可以通过动态数据左上角的全局搜索进行找到对应文件
 动态数据往往会用json存储，所以写代码的时候得留意，并且数据往往不止一页，有多页，需要采取多页连续采取import requests  key_word = input(&#x27;请输入关键词:&#x27;)  page_input = input(&#x27;请输入页码(如1-5或1,2,3)：&#x27;)    pages=[]  if &#x27;-&#x27; in page_input:      start,end = map(int, page_input.split(&#x27;-&#x27;))      pages= list(range(start, end+1))  else:      pages = [int(page_input)]    with open(&#x27;kfc1.txt&#x27;,&#x27;w&#x27;,encoding=&#x27;utf-8&#x27;) as f:      f.write(&quot;门店名称\t地址\n&quot;)  # 写入表头      for page in pages:          url = &#x27;http://www.kfc.com.cn/kfccda/ashx/GetStoreList.ashx?op=keyword&#x27;          header = &#123;          &#x27;user-agent&#x27;: &#x27;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36&#x27;          &#125;          data = &#123;              &#x27;cname&#x27;:&#x27;&#x27; ,               &#x27;pid&#x27;: &#x27;&#x27;,              &#x27;keyword&#x27;: key_word,              &#x27;pageIndex&#x27;: page,              &#x27;pageSize&#x27;: &#x27;10&#x27;          &#125;            response = requests.post(url=url,headers=header,data=data)          response.encoding= &#x27;utf-8&#x27;          page_KFC = response.json()            for detail in page_KFC[&#x27;Table1&#x27;]:              storename = detail.get(&#x27;storeName&#x27;, &#x27;N/A&#x27;)              add = detail.get(&#x27;addressDetail&#x27;, &#x27;N/A&#x27;)              f.write(f&quot;&#123;storename&#125;\t&#123;add&#125;\n&quot;)              print(f&quot;成功保存：&#123;storename&#125;-&#123;add&#125;&quot;)
 
+]]></content>
+  </entry>
+  <entry>
+    <title>python爬虫学习（二）</title>
+    <url>/2025/04/15/%E7%88%AC%E8%99%AB%EF%BC%88%E4%BA%8C%EF%BC%89/</url>
+    <content><![CDATA[1、数据解析- 
 ]]></content>
   </entry>
   <entry>
