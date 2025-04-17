@@ -64,7 +64,10 @@ import requests  from lxml import etree    page_input = input(&#x27;请输入搜
   <entry>
     <title>python爬虫学习（三）</title>
     <url>/2025/04/16/%E7%88%AC%E8%99%AB%EF%BC%88%E4%B8%89%EF%BC%89/</url>
-    <content><![CDATA[1.防盗链
+    <content><![CDATA[tip
+要是觉得找elements中对应部分有点麻烦，可以用ctrl+shift+c然后点网页你想要的部分，开发者模式中就会跳转过去了。
+
+1.防盗链
 现在很多网站启用了防盗链反爬，防止服务器上的资源被人恶意盗取。什么是防盗链呢？
 
 从HTTP协议说起，在HTTP协议中，有一个表头字段：referer，采用URL的格式来表示从哪一个链接跳转到当前网页的。通俗理解就是：客户端的请求具体从哪里来，服务器可以通过referer进行溯源。一旦检测来源不是网页所规定的，立即进行阻止或者返回指定的页面。
