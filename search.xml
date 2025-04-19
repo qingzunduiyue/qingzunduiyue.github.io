@@ -31,6 +31,53 @@ import requests  url = &#x27;http://www.cpta.com.cn/category/search&#x27;  key_w
 ]]></content>
   </entry>
   <entry>
+    <title>python爬虫学习（三）</title>
+    <url>/2025/04/16/%E7%88%AC%E8%99%AB%EF%BC%88%E4%B8%89%EF%BC%89/</url>
+    <content><![CDATA[tip
+要是觉得找elements中对应部分有点麻烦，可以用ctrl+shift+c然后点网页你想要的部分，开发者模式中就会跳转过去了。
+
+1.防盗链
+现在很多网站启用了防盗链反爬，防止服务器上的资源被人恶意盗取。什么是防盗链呢？
+
+从HTTP协议说起，在HTTP协议中，有一个表头字段：referer，采用URL的格式来表示从哪一个链接跳转到当前网页的。通俗理解就是：客户端的请求具体从哪里来，服务器可以通过referer进行溯源。一旦检测来源不是网页所规定的，立即进行阻止或者返回指定的页面。
+
+
+
+2. 三里屯抓拍图爬取网址：http://blog.sina.com.cn/s/blog_01ebcb8a0102zi2o.html?tj=1可以尝试按先前的方式先去爬取试试，你会发现无法爬取想要的照片，当你用开发者模式去看的时候，你会发现她有两个url，你尝试两个src会发现两个都得不到正确的图片，这就是防盗链的作用，所以我们需要再header中加入referer那么如何去找到referer呢?你需要在network中找到要爬取的图片，可以通过预览迅速辨认是否自己要找的图片，具体可按下图：
+import requests  from lxml import etree  url = &#x27;http://blog.sina.com.cn/s/blog_01ebcb8a0102zi2o.html?tj=1&#x27;  header = &#123;      &#x27;user-agent&#x27;: &#x27;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36&#x27;,      &#x27;referer&#x27;:&#x27;https://blog.sina.com.cn/s/blog_01ebcb8a0102zi2o.html?tj=1&#x27;      # &quot;Referer&quot;: &quot;http://blog.sina.com.cn/&quot;  &#125;  response = requests.get(url=url,headers=header)  response.encoding=&#x27;utf-8&#x27;  page_img= response.text  tree = etree.HTML(page_img)  img_list = tree.xpath(&#x27;//*[@id=&quot;sina_keyword_ad_area2&quot;]/div/a/img/@real_src&#x27;)  for img in img_list:      data = requests.get(url=img,headers=header).content      with open(&#x27;name.jpg&#x27;,&#x27;wb&#x27;) as f:          f.write(data)      break
+
+3. cookie
+什么是cookie？
+cookie的本质就是一组数据（键值对的形式存在）
+是由服务器创建，返回给客户端，最终会保存在客户端浏览器中。
+如果客户端保存了cookie，则下次再次访问该服务器，就会携带cookie进行网络访问。
+典型的案例：网站的免密登录
+
+
+
+
+
+tip在通过的之前学习后，相信对于爬虫代码的基础部分已经有所掌握，对于这些开源的数据在有爬虫技术前真要获取也是可以的，比如说你一个个人工去搜集得到，但这种机械化又大量的工作正是促使爬虫技术的诞生，更进一步，一些爬虫的技术代码是否也是如此呢？据此，我想要介绍一个工具‘curlconverter’网址：https://curlconverter.com/通过上述步骤再复制的网站中，就可得到如下一些基础的代码，也可以提高一定的效率。
+案例：雪球网数据#ps：用谷歌和edge可能会无法用开发者模式获取数据，可能是一种反爬机制，但博主用联想浏览器可以打开，并且代码可以成功运行。网址：https://xueqiu.com/如上图一样找到curl，然后到之前的给出的网站获得对应的代码再进行修改即可，代码如下：
+import time    import requests  import json  pages = input(&#x27;请你输入想要爬取几页：&#x27;)  cookies = &#123;      &#x27;xq_a_token&#x27;: &#x27;9773bacc11404cb5ac8b0847c564eda3730e6b61&#x27;,      &#x27;xqat&#x27;: &#x27;9773bacc11404cb5ac8b0847c564eda3730e6b61&#x27;,      &#x27;xq_r_token&#x27;: &#x27;caf75c71460c20a680e6e3c455cadcca5c1be14a&#x27;,      &#x27;xq_id_token&#x27;: &#x27;eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ1aWQiOi0xLCJpc3MiOiJ1YyIsImV4cCI6MTc0NzM1NzE4MywiY3RtIjoxNzQ1MDQ4NDMxOTI5LCJjaWQiOiJkOWQwbjRBWnVwIn0.S6DfPNTKxGAQwLt9gFPf2A16vqu5_UCPLrr5qgtlUuGnbtmGSsahB6kSe_bfpCbwvNmGgoDQ6Ot2vVDQtXwJfqWXNS8pKzskKHhed8L48G4uV0g1iX4dmrWqHFfZwwCVn3YKEH2H7dP20eU_U1FTXC8ikqHtjXPxu661rmTMGVdKG3xD5uM8DDcwZUBC6ZpetUUtzTe5To_8prNyBFujdfuUsd8zsaS-1gRCgqyiRWgQxAq204mmgo7uJ7TDWjwfYnSvg0m_JMYW8Wj7MV5ajR2dRM3XBEcNFtOWYNQi0xWhY13vt-NDZLKBWNE4mkirNtjG5cdjTO03ATJ6eYDYhg&#x27;,      &#x27;cookiesu&#x27;: &#x27;401745048477218&#x27;,      &#x27;u&#x27;: &#x27;401745048477218&#x27;,      &#x27;device_id&#x27;: &#x27;e67adc9306236a61a4c97845cd9ebec4&#x27;,      &#x27;Hm_lvt_1db88642e346389874251b5a1eded6e3&#x27;: &#x27;1745048506&#x27;,      &#x27;HMACCOUNT&#x27;: &#x27;A39F3B65D44D61BF&#x27;,      &#x27;Hm_lpvt_1db88642e346389874251b5a1eded6e3&#x27;: &#x27;1745048777&#x27;,      &#x27;ssxmod_itna&#x27;: &#x27;QqUOGKAK0KD5YKGQGCDhZILq7QGO1D7IDkDl4BtGRDeq7tDRDFqApYDHKjwzdsYWD1Axx4tFmAeR5DBMxbDSxD6ODK4GTpIoeWXPeDpBxIIrYQgrXorDcmeM5qwjer+pjsL/6MzpDCPGnD06x+ALbDYYLDBYD74G+DDeDi23Dj4GmDGAdNeDFGnb=gebPTxDwDB=DmkwWYPDfDDdYsBYiGlcVIeeD0qmsxo4Q+DGWGQuVW=p=DGUxRWQYx0UFDBLef/FDGu8jxguQsFQ+HbrWrPGuDG=HXQ0=jORiyli+do+qF4VbB34TK7tO7e=G4q7x1gDcfx+YqpYh80QTGGID=CE+pDDi2X=RpqiAb7Un2tYgtBa4TnG9mbg0eUeKilP7/Dd9wsmGGQe+WKHthQCD4eheWA/=xxD&#x27;,      &#x27;ssxmod_itna2&#x27;: &#x27;QqUOGKAK0KD5YKGQGCDhZILq7QGO1D7IDkDl4BtGRDeq7tDRDFqApYDHKjwzdsYWD1Axx4tFmAebDia4WEINhSngwzVbeCY2YeI3afD&#x27;,  &#125;    headers = &#123;      &#x27;accept&#x27;: &#x27;application/json, text/plain, */*&#x27;,      &#x27;accept-language&#x27;: &#x27;zh-CN,zh;q=0.9&#x27;,      &#x27;origin&#x27;: &#x27;https://xueqiu.com&#x27;,      &#x27;priority&#x27;: &#x27;u=1, i&#x27;,      &#x27;referer&#x27;: &#x27;https://xueqiu.com/&#x27;,      &#x27;sec-ch-ua&#x27;: &#x27;&quot;Chromium&quot;;v=&quot;9&quot;, &quot;Not?A_Brand&quot;;v=&quot;8&quot;&#x27;,      &#x27;sec-ch-ua-mobile&#x27;: &#x27;?0&#x27;,      &#x27;sec-ch-ua-platform&#x27;: &#x27;&quot;Windows&quot;&#x27;,      &#x27;sec-fetch-dest&#x27;: &#x27;empty&#x27;,      &#x27;sec-fetch-mode&#x27;: &#x27;cors&#x27;,      &#x27;sec-fetch-site&#x27;: &#x27;same-site&#x27;,      &#x27;user-agent&#x27;: &#x27;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36 SLBrowser/9.0.6.2081 SLBChan/103 SLBVPV/64-bit&#x27;,  &#125;  l = []  for page in pages:      params = &#123;          &#x27;page&#x27;: page,          &#x27;size&#x27;: &#x27;10&#x27;,          &#x27;type&#x27;: &#x27;sha&#x27;,          &#x27;order_by&#x27;: &#x27;percent&#x27;,          &#x27;order&#x27;: &#x27;desc&#x27;,      &#125;        response = requests.get(          &#x27;https://stock.xueqiu.com/v5/stock/screener/quote/list.json&#x27;,          params=params,          cookies=cookies,          headers=headers,      )      d = response.json().get(&#x27;data&#x27;).get(&#x27;list&#x27;)      # print(d)        l.extend(d)      # print(l)      #确保不要访问频率过快    time.sleep(1)    with open(&#x27;list.json&#x27;,&#x27;w&#x27;) as fp:      fp.write(json.dumps(l, indent=2, ensure_ascii=False))
+
+但是虽然目前的cookie都能直接用，但实际上在主流的网站，对于cookie可能是有防备的，比如cookie可能会有有效期，或者说cookie就是一次性的，当这种情况下，对于，这样获取的cookie可能就无法成功用于代码中正如先前所言，所有爬虫代码的不成功都是拟人度不够，比如说现在的代码都是根据请求头和网址直接进去数据所在的页面，但是正常流程应该是打开网站的首页，再点击之后的，所以通过代码先对主页面进行访问，浏览器会给代码一个全新的cookie，代码通过这个cookie就可以更稳定运行了
+import requests  # 第一次请求  import requests    headers = &#123;      &#x27;Accept&#x27;: &#x27;text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7&#x27;,      &#x27;Accept-Language&#x27;: &#x27;zh-CN,zh;q=0.9&#x27;,      &#x27;Cache-Control&#x27;: &#x27;no-cache&#x27;,      &#x27;Connection&#x27;: &#x27;keep-alive&#x27;,      &#x27;Pragma&#x27;: &#x27;no-cache&#x27;,      &#x27;Sec-Fetch-Dest&#x27;: &#x27;document&#x27;,      &#x27;Sec-Fetch-Mode&#x27;: &#x27;navigate&#x27;,      &#x27;Sec-Fetch-Site&#x27;: &#x27;none&#x27;,      &#x27;Sec-Fetch-User&#x27;: &#x27;?1&#x27;,      &#x27;Upgrade-Insecure-Requests&#x27;: &#x27;1&#x27;,      &#x27;User-Agent&#x27;: &#x27;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36&#x27;,      &#x27;sec-ch-ua&#x27;: &#x27;&quot;Chromium&quot;;v=&quot;130&quot;, &quot;Google Chrome&quot;;v=&quot;130&quot;, &quot;Not?A_Brand&quot;;v=&quot;99&quot;&#x27;,      &#x27;sec-ch-ua-mobile&#x27;: &#x27;?0&#x27;,      &#x27;sec-ch-ua-platform&#x27;: &#x27;&quot;macOS&quot;&#x27;,  &#125;  url = &#x27;https://xueqiu.com/hq&#x27;  response = requests.get(url, headers=headers)  # print(response.status_code)  # print(response.headers)  # print(response.content)  # print(response.text)  print(response.cookies.get_dict())  c1 = response.cookies.get_dict()    # 第二次请求，携带动态cookie  headers = &#123;      &#x27;accept&#x27;: &#x27;application/json, text/plain, */*&#x27;,      &#x27;accept-language&#x27;: &#x27;zh-CN,zh;q=0.9&#x27;,      &#x27;cache-control&#x27;: &#x27;no-cache&#x27;,      &#x27;origin&#x27;: &#x27;https://xueqiu.com&#x27;,      &#x27;pragma&#x27;: &#x27;no-cache&#x27;,      &#x27;priority&#x27;: &#x27;u=1, i&#x27;,      &#x27;referer&#x27;: &#x27;https://xueqiu.com/&#x27;,      &#x27;sec-ch-ua&#x27;: &#x27;&quot;Chromium&quot;;v=&quot;130&quot;, &quot;Google Chrome&quot;;v=&quot;130&quot;, &quot;Not?A_Brand&quot;;v=&quot;99&quot;&#x27;,      &#x27;sec-ch-ua-mobile&#x27;: &#x27;?0&#x27;,      &#x27;sec-ch-ua-platform&#x27;: &#x27;&quot;macOS&quot;&#x27;,      &#x27;sec-fetch-dest&#x27;: &#x27;empty&#x27;,      &#x27;sec-fetch-mode&#x27;: &#x27;cors&#x27;,      &#x27;sec-fetch-site&#x27;: &#x27;same-site&#x27;,      &#x27;user-agent&#x27;: &#x27;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36&#x27;,  &#125;    params = &#123;      &#x27;page&#x27;: &#x27;1&#x27;,      &#x27;size&#x27;: &#x27;10&#x27;,      &#x27;type&#x27;: &#x27;sha&#x27;,      &#x27;order_by&#x27;: &#x27;percent&#x27;,      &#x27;order&#x27;: &#x27;desc&#x27;,      &#x27;md5__1632&#x27;: &#x27;7q+xuQKDqmwOD/Wi4BKw1QDcWODO7fAeD&#x27;,  &#125;    response = requests.get(      &#x27;https://stock.xueqiu.com/v5/stock/screener/quote/list.json&#x27;,      params=params,      cookies=c1,      headers=headers,  )    print(response.text)
+
+ 基于session对象实现自动处理cookie。
+
+1.创建一个空白的session对象。
+2.需要使用session对象发起请求，请求的目的是为了捕获cookie    - 注意：如果session对象在发请求的过程中，服务器端产生了cookie，则cookie会自动存储在session对象中。
+3.使用携带cookie的session对象，对目的网址发起请求，就可以实现携带cookie的请求发送，从而获取想要的数据。
+
+注意：session对象至少需要发起两次请求
+
+第一次请求的目的是为了捕获存储cookie到session对象
+后次的请求，就是携带cookie发起的请求了import requests  # 第一次请求  import requests  session = requests.session()    headers = &#123;      &#x27;Accept&#x27;: &#x27;text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7&#x27;,      &#x27;Accept-Language&#x27;: &#x27;zh-CN,zh;q=0.9&#x27;,      &#x27;Cache-Control&#x27;: &#x27;no-cache&#x27;,      &#x27;Connection&#x27;: &#x27;keep-alive&#x27;,      &#x27;Pragma&#x27;: &#x27;no-cache&#x27;,      &#x27;Sec-Fetch-Dest&#x27;: &#x27;document&#x27;,      &#x27;Sec-Fetch-Mode&#x27;: &#x27;navigate&#x27;,      &#x27;Sec-Fetch-Site&#x27;: &#x27;none&#x27;,      &#x27;Sec-Fetch-User&#x27;: &#x27;?1&#x27;,      &#x27;Upgrade-Insecure-Requests&#x27;: &#x27;1&#x27;,      &#x27;User-Agent&#x27;: &#x27;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36&#x27;,      &#x27;sec-ch-ua&#x27;: &#x27;&quot;Chromium&quot;;v=&quot;130&quot;, &quot;Google Chrome&quot;;v=&quot;130&quot;, &quot;Not?A_Brand&quot;;v=&quot;99&quot;&#x27;,      &#x27;sec-ch-ua-mobile&#x27;: &#x27;?0&#x27;,      &#x27;sec-ch-ua-platform&#x27;: &#x27;&quot;macOS&quot;&#x27;,  &#125;  url = &#x27;https://xueqiu.com/hq&#x27;  # session：自动管理session  session.get(url, headers=headers)        # 第二次请求，携带动态cookie  headers = &#123;      &#x27;accept&#x27;: &#x27;application/json, text/plain, */*&#x27;,      &#x27;accept-language&#x27;: &#x27;zh-CN,zh;q=0.9&#x27;,      &#x27;cache-control&#x27;: &#x27;no-cache&#x27;,      #&#x27;cookie&#x27;: &#x27;u=851695628862640; HMACCOUNT=2A4FB6ADBAE70C94; cookiesu=591728562312333; device_id=ce2bbbc0e3a672b689052fc9204f8b61; xq_a_token=7716f523735d1e47a3dd5ec748923068ab8198a8; xqat=7716f523735d1e47a3dd5ec748923068ab8198a8; xq_r_token=0483ea3986e45954e03c9294444a1af14d7579d3; xq_id_token=eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ1aWQiOi0xLCJpc3MiOiJ1YyIsImV4cCI6MTczMzEwMDgxNywiY3RtIjoxNzMxNzY2NTA1ODkyLCJjaWQiOiJkOWQwbjRBWnVwIn0.GqQPJ3wNkRxoWlb8W32s66nnlZCr9_8QhlChq5S2hdVOPBA4JcZFM2d9XaxkULzYt9KxFnDKa4dx_t4BDWfK-Bm9pV5YiheFBwvePRwnFldsSgVuw-SJBHTthJCo3wOzFkxubRyFtC248rKmuNPSaD1x7QtTHFk77O-5917lxJlip61oEZ-o1c51N31vGcQfxjzK2Do1xwPaU-3MZK_-jL3wuMZEcbRCbBTpD1GQj7PrATbajsO4Z1x7Xf58CmrLHeBz6DXIhNDf28MkxoEjSzT-mSNsCEIMXp0dbSQqhEp0D1hX3LqcCKLHebCRTiR0dMPMMIR1E_0a4-swY9Goag; Hm_lvt_1db88642e346389874251b5a1eded6e3=1731766508; is_overseas=0; ssxmod_itna=iqGxyDBiitG=KAIK0dGQDHYySeewx7IXIKAmYedND/SGIDnqD=GFDK40EoSxPd+3iYDxR3hGl7A4+F1/n8GwFoFx+OpxXSQxiTD4q07Db4GkDAqiOD7uqhoD445GwD0eG+DD4DWzqDU/fhKDjGHCcp5HAOIHfh5DbhKODiK8DYvpDAThVPYzCcxzDDapDlKhDWPODQHsAxKDExGOX+ImBxGaFfSLmbKDEj+Cmb3DvcOOG12z/xY8/txYeWpkU6nePchYYjixGn0Dzn293EDyF704dDrP3r0FkrZeee3lzYD=; ssxmod_itna2=iqGxyDBiitG=KAIK0dGQDHYySeewx7IXIKAmYedG9WMtDBL80D7prMqaG2YzxFqG7eeD; Hm_lpvt_1db88642e346389874251b5a1eded6e3=1731766579&#x27;,      &#x27;origin&#x27;: &#x27;https://xueqiu.com&#x27;,      &#x27;pragma&#x27;: &#x27;no-cache&#x27;,      &#x27;priority&#x27;: &#x27;u=1, i&#x27;,      &#x27;referer&#x27;: &#x27;https://xueqiu.com/&#x27;,      &#x27;sec-ch-ua&#x27;: &#x27;&quot;Chromium&quot;;v=&quot;130&quot;, &quot;Google Chrome&quot;;v=&quot;130&quot;, &quot;Not?A_Brand&quot;;v=&quot;99&quot;&#x27;,      &#x27;sec-ch-ua-mobile&#x27;: &#x27;?0&#x27;,      &#x27;sec-ch-ua-platform&#x27;: &#x27;&quot;macOS&quot;&#x27;,      &#x27;sec-fetch-dest&#x27;: &#x27;empty&#x27;,      &#x27;sec-fetch-mode&#x27;: &#x27;cors&#x27;,      &#x27;sec-fetch-site&#x27;: &#x27;same-site&#x27;,      &#x27;user-agent&#x27;: &#x27;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36&#x27;,  &#125;    params = &#123;      &#x27;page&#x27;: &#x27;1&#x27;,      &#x27;size&#x27;: &#x27;10&#x27;,      &#x27;type&#x27;: &#x27;sha&#x27;,      &#x27;order_by&#x27;: &#x27;percent&#x27;,      &#x27;order&#x27;: &#x27;desc&#x27;,      &#x27;md5__1632&#x27;: &#x27;7q+xuQKDqmwOD/Wi4BKw1QDcWODO7fAeD&#x27;,  &#125;    response = session.get(      &#x27;https://stock.xueqiu.com/v5/stock/screener/quote/list.json&#x27;,      params=params,      headers=headers,  )    print(response.text)
+
+]]></content>
+  </entry>
+  <entry>
     <title>python爬虫学习（二）</title>
     <url>/2025/04/15/%E7%88%AC%E8%99%AB%EF%BC%88%E4%BA%8C%EF%BC%89/</url>
     <content><![CDATA[题外话
@@ -59,109 +106,12 @@ import requests  from lxml import etree  from urllib.parse import urljoin    url
 4. 简历爬取网址&#x3D; https://sc.chinaz.com/jianli/下述就是需要得到的xpath
 import requests  from lxml import etree    page_input = input(&#x27;请输入搜索页码（1-5）：&#x27;)    pages=[]  if &#x27;-&#x27; in page_input:      start,end = map(int, page_input.split(&#x27;-&#x27;))      pages= list(range(start, end+1))  else:      pages = [int(page_input)]    for page in (1,2):      if page == 1:          url = &#x27;https://sc.chinaz.com/jianli/index.html&#x27;      else:          url = &#x27;https://sc.chinaz.com/jianli/index_%d.html&#x27;%page      print(&#x27;当前正在爬取第%d页的数据&#x27;%page)      header = &#123;      &#x27;user-agent&#x27;: &#x27;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36&#x27;,        &#125;      response = requests.get(url=url, headers=header)      response.encoding=&#x27;utf-8&#x27;      page_jianli = response.text      tree = etree.HTML(page_jianli)      div_list = tree.xpath(&#x27;//*[@id=&quot;container&quot;]/div&#x27;)      for div in div_list:          title = div.xpath(&#x27;./p/a/text()&#x27;)[0]          detail_url = div.xpath(&#x27;./a/@href&#x27;)[0]          jianli_response = requests.get(url=detail_url,headers=header)          jianli_response.encoding= &#x27;utf-8&#x27;          page_down = jianli_response.text          #创建etree对象，将数据存入对象中          down_tree = etree.HTML(page_down)          #通过标签定位获取数据          down_url = down_tree.xpath(&#x27;//*[@id=&quot;down&quot;]/div[2]/ul/li[1]/a/@href&#x27;)[0]          down_response = requests.get(url=down_url,headers=header)          down_content = down_response.content          name = &#x27;./jianli/&#x27;+ title+ &#x27;.rar&#x27;          with open(name,&#x27;wb&#x27;) as f:              f.write(down_content)
 
+**ps（pthon）
+
+序列化：json.dumps()
+反序列化：json.load()
+
 ]]></content>
-  </entry>
-  <entry>
-    <title>python爬虫学习（三）</title>
-    <url>/2025/04/16/%E7%88%AC%E8%99%AB%EF%BC%88%E4%B8%89%EF%BC%89/</url>
-    <content><![CDATA[tip
-要是觉得找elements中对应部分有点麻烦，可以用ctrl+shift+c然后点网页你想要的部分，开发者模式中就会跳转过去了。
-
-1.防盗链
-现在很多网站启用了防盗链反爬，防止服务器上的资源被人恶意盗取。什么是防盗链呢？
-
-从HTTP协议说起，在HTTP协议中，有一个表头字段：referer，采用URL的格式来表示从哪一个链接跳转到当前网页的。通俗理解就是：客户端的请求具体从哪里来，服务器可以通过referer进行溯源。一旦检测来源不是网页所规定的，立即进行阻止或者返回指定的页面。
-
-
-
-2. 三里屯抓拍图爬取网址：http://blog.sina.com.cn/s/blog_01ebcb8a0102zi2o.html?tj=1可以尝试按先前的方式先去爬取试试，你会发现无法爬取想要的照片，当你用开发者模式去看的时候，你会发现她有两个url，你尝试两个src会发现两个都得不到正确的图片，这就是防盗链的作用，所以我们需要再header中加入referer那么如何去找到referer呢?你需要在network中找到要爬取的图片，可以通过预览迅速辨认是否自己要找的图片，具体可按下图：
-import requests  from lxml import etree  url = &#x27;http://blog.sina.com.cn/s/blog_01ebcb8a0102zi2o.html?tj=1&#x27;  header = &#123;      &#x27;user-agent&#x27;: &#x27;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36&#x27;,      &#x27;referer&#x27;:&#x27;https://blog.sina.com.cn/s/blog_01ebcb8a0102zi2o.html?tj=1&#x27;      # &quot;Referer&quot;: &quot;http://blog.sina.com.cn/&quot;  &#125;  response = requests.get(url=url,headers=header)  response.encoding=&#x27;utf-8&#x27;  page_img= response.text  tree = etree.HTML(page_img)  img_list = tree.xpath(&#x27;//*[@id=&quot;sina_keyword_ad_area2&quot;]/div/a/img/@real_src&#x27;)  for img in img_list:      data = requests.get(url=img,headers=header).content      with open(&#x27;name.jpg&#x27;,&#x27;wb&#x27;) as f:          f.write(data)      break
-]]></content>
-  </entry>
-  <entry>
-    <title></title>
-    <url>/css/custom.css</url>
-    <content><![CDATA[/* 导航栏模块 */
-/* 一级菜单居中 */
-#nav .menus_items {
-    position: absolute !important;
-    width: fit-content !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    font-size: 25px !important; /* 独立于全局字体 */
-      
-}
-
-/* 子菜单横向展示 */
-#nav .menus_items .menus_item:hover .menus_item_child {
-    display: row !important;
-}
-
-/* 这里的2是代表导航栏的第2个元素，即有子菜单的元素，可以按自己需求修改 */
-.menus_items .menus_item:nth-child(5) .menus_item_child {
-    left: -50px;
-}
-
-
-
-/* 背景的通明度模块 */
-/* 文章页背景 */
-.layout_post>#post {
-    /* 以下代表透明度为0.7 可以自行修改*/
-    background: rgba(255,255,255,.9);
-
-}
- 
-/* 所有页面背景 */
-#aside_content .card-widget, #recent-posts>.recent-post-item, .layout_page>div:first-child:not(.recent-posts), .layout_post>#page, .layout_post>#post, .read-mode .layout_post>#post{
-    /* 以下代表透明度为0.7 */
-    background: rgba(255,255,255,.9);
-    border:2px solid #0ff5ff;
-    box-shadow: 1px 1px 10px #0ff5ff;
- 
-}
-/* 侧边卡片的透明度 */
-:root {
-  --card-bg: rgba(255, 255, 255, .9);
-}
-
-/* 页脚透明 */
-#footer {
-	/* 以下代表透明度为0.7 */
-	background: rgba(255,255,255, .0);
-}
- 
-
-:root {
-    --global-font-size: 20px;
-}
-
-
-.aplayer .aplayer-list ol li.aplayer-list-light, .aplayer, #aside_content .card-widget, #recent-posts>.recent-post-item, .layout>div:first-child:not(.recent-posts), .layout_post>#page, .layout_post>#post, .read-mode .layout_post>#post{
-    /* ä»¥ä¸‹ä»£è¡¨ç™½è‰²é€æ˜Žåº¦ä¸º0.3 */
-    background: rgba(255, 255, 255, 0.9);
-    border:2px solid #0ff5ff;
-    box-shadow: 1px 1px 10px #0ff5ff;
-}
-
-
-
-
-
-
-  
- .recent-post-item{
-
-    background: rgba(255, 255, 255, 0.9);
-    border:2px solid #0ff5ff;
-    box-shadow: 1px 1px 10px #0fffc3;
-}
-]]></content>
-  </entry>
-  <entry>
-    <title>关于我</title>
-    <url>/about/index.html</url>
-    <content><![CDATA[]]></content>
   </entry>
   <entry>
     <title></title>
@@ -478,8 +428,8 @@ toc-child {
 }]]></content>
   </entry>
   <entry>
-    <title>音乐</title>
-    <url>/music/index.html</url>
+    <title>关于我</title>
+    <url>/about/index.html</url>
     <content><![CDATA[]]></content>
   </entry>
   <entry>
@@ -488,18 +438,113 @@ toc-child {
     <content><![CDATA[]]></content>
   </entry>
   <entry>
-    <title>友情链接</title>
-    <url>/link/index.html</url>
-    <content><![CDATA[]]></content>
-  </entry>
-  <entry>
     <title>小说</title>
     <url>/novels/index.html</url>
     <content><![CDATA[]]></content>
   </entry>
   <entry>
+    <title>友情链接</title>
+    <url>/link/index.html</url>
+    <content><![CDATA[]]></content>
+  </entry>
+  <entry>
+    <title>音乐</title>
+    <url>/music/index.html</url>
+    <content><![CDATA[]]></content>
+  </entry>
+  <entry>
     <title>tags</title>
     <url>/tags/index.html</url>
+    <content><![CDATA[]]></content>
+  </entry>
+  <entry>
+    <title></title>
+    <url>/css/custom.css</url>
+    <content><![CDATA[/* 导航栏模块 */
+/* 一级菜单居中 */
+#nav .menus_items {
+    position: absolute !important;
+    width: fit-content !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    font-size: 25px !important; /* 独立于全局字体 */
+      
+}
+
+/* 子菜单横向展示 */
+#nav .menus_items .menus_item:hover .menus_item_child {
+    display: row !important;
+}
+
+/* 这里的2是代表导航栏的第2个元素，即有子菜单的元素，可以按自己需求修改 */
+.menus_items .menus_item:nth-child(5) .menus_item_child {
+    left: -50px;
+}
+
+
+
+/* 背景的通明度模块 */
+/* 文章页背景 */
+.layout_post>#post {
+    /* 以下代表透明度为0.7 可以自行修改*/
+    background: rgba(255,255,255,.9);
+
+}
+ 
+/* 所有页面背景 */
+#aside_content .card-widget, #recent-posts>.recent-post-item, .layout_page>div:first-child:not(.recent-posts), .layout_post>#page, .layout_post>#post, .read-mode .layout_post>#post{
+    /* 以下代表透明度为0.7 */
+    background: rgba(255,255,255,.9);
+    border:2px solid #0ff5ff;
+    box-shadow: 1px 1px 10px #0ff5ff;
+ 
+}
+/* 侧边卡片的透明度 */
+:root {
+  --card-bg: rgba(255, 255, 255, .9);
+}
+
+/* 页脚透明 */
+#footer {
+	/* 以下代表透明度为0.7 */
+	background: rgba(255,255,255, .0);
+}
+ 
+
+:root {
+    --global-font-size: 20px;
+}
+
+
+.aplayer .aplayer-list ol li.aplayer-list-light, .aplayer, #aside_content .card-widget, #recent-posts>.recent-post-item, .layout>div:first-child:not(.recent-posts), .layout_post>#page, .layout_post>#post, .read-mode .layout_post>#post{
+    /* ä»¥ä¸‹ä»£è¡¨ç™½è‰²é€æ˜Žåº¦ä¸º0.3 */
+    background: rgba(255, 255, 255, 0.9);
+    border:2px solid #0ff5ff;
+    box-shadow: 1px 1px 10px #0ff5ff;
+}
+
+
+
+
+
+
+  
+ .recent-post-item{
+
+    background: rgba(255, 255, 255, 0.9);
+    border:2px solid #0ff5ff;
+    box-shadow: 1px 1px 10px #0fffc3;
+}
+]]></content>
+  </entry>
+  <entry>
+    <title>醉欢行</title>
+    <url>/%E9%86%89%E6%AC%A2%E8%A1%8C/index.html</url>
+    <content><![CDATA[]]></content>
+  </entry>
+  <entry>
+    <title>水调歌头</title>
+    <url>/poem/%E6%B0%B4%E8%B0%83%E6%AD%8C%E5%A4%B4.html</url>
     <content><![CDATA[]]></content>
   </entry>
   <entry>
@@ -582,16 +627,6 @@ toc-child {
 闻言，楚宇也是暗松了口气，在听到江耿是尚东的后，也了然原因，楚宇父亲也是尚东镇的，偶尔自驾来回一趟便要花费不少时间，更别说是坐城乡公交车了，导致平日里那边公交车的排班确实不多。楚宇没放下手中的工作，边整理边回答：
 “”
 ]]></content>
-  </entry>
-  <entry>
-    <title>醉欢行</title>
-    <url>/%E9%86%89%E6%AC%A2%E8%A1%8C/index.html</url>
-    <content><![CDATA[]]></content>
-  </entry>
-  <entry>
-    <title>水调歌头</title>
-    <url>/poem/%E6%B0%B4%E8%B0%83%E6%AD%8C%E5%A4%B4.html</url>
-    <content><![CDATA[]]></content>
   </entry>
   <entry>
     <title>诗词</title>
