@@ -144,6 +144,115 @@ from DrissionPage import ChromiumPage  from cookie import name,password  import 
 ]]></content>
   </entry>
   <entry>
+    <title>python爬虫学习（四）</title>
+    <url>/2025/04/21/%E7%88%AC%E8%99%AB%EF%BC%88%E5%9B%9B%EF%BC%89/</url>
+    <content><![CDATA[scrapy框架1. 概念在网络数据采集的领域，Scrapy无疑是一款强大而高效的爬虫框架。它为用户提供了丰富的功能，能够快速抓取和解析网站数据。无论是简单的网页抓取还是复杂的数据提取，Scrapy都能助你一臂之力。
+
+
+
+requests
+scrapy
+
+
+
+页面级爬虫
+网站级爬虫
+
+
+功能库
+框架
+
+
+并发性考虑不足，性能较差
+并发性好，性能高
+
+
+重点在于页面下载
+重点在于爬虫结构
+
+
+定制灵活
+一般制定灵活，深度制定困难
+
+
+上手十分简单
+入门稍难
+
+
+相关图如下：
+
+
+
+
+
+
+
+
+Spiders：中文可以称为蜘蛛，Spiders 是一个复数的统称，其可以对应多个 Spider，每个 Spider 里面定义了站点的爬取逻辑和页面的解析规则。
+Scrapy Engine：引擎，是整个框架的核心。可以理解为整个框架的中央处理器(类似人的大脑)，负责数据的流转和逻辑的处理。
+Scheduler：调度器，它用来接受 Engine 发过来的 Request 并将其加入队列中，同时也可以将 Request 发回给 Engine 供 Downloader 执行
+Downloader：下载器，完成向服务器发送请求，然后拿到响应的过程，并发送给Egine
+Item pipeline：管道，用于处理抽取的数据，例如数据清洗、保存到数据库等。
+Item：它是一个抽象的数据结构，所以在图中没有体现出来，它定义了爬取结果的数据结构，爬取的数据会被赋值成 Item 对象。
+
+2.豆瓣电影爬取网址：https://movie.douban.com/先下载scrapy相关
+pip install scrapy
+下载完成后，先创建一个scrapy项目，在你想要创建的文件夹中cmd打开，并输入
+scrapy startproject 你的项目名
+之后cmd’中会提示你进行
+cd 你的项目名scrapy genspider example example.com #example example.com 也是需要进行修改的，并且不能和项目名一致，且这个注释不能复制到cmd中
+创建完项目之后，用pycharm打开即可，之后可以先去分析网址，我认为这一步是尤为重要的，尤其是在scrapy框架此类工具帮助下，代码的书写越来越简单，对网页的分析占比在一次爬虫任务中更为重要。
+2.1 items.py通过开发者模式将想要爬取的数据进行定位，确定要爬取哪些信息，然后在items.py中写入对应的对象。
+class DoubanItem(scrapy.Item):      rank = scrapy.Field()  # 电影排名      movie_name = scrapy.Field() #电影名称      movie_quote = scrapy.Field()  # 电影名言      picture = scrapy.Field()  # 电影海报链接      movie_rating = scrapy.Field()  # 电影评分      evaluators = scrapy.Field()  # 评价人数
+2.2 db.py （自己命名的那个）完成items的代码后，开始常规上的第一步，也就是对你的db.py进行编写代码
+name = &quot;db&quot;  allowed_domains = [&quot;movie.douban.com&quot;]  # 允许的域名范围  start_urls = [&quot;https://movie.douban.com/top250&quot;]  # 爬虫从这个 URL 开始抓取
+上述这个代码是你在先前scrapy genspider example example.com 时就会默认生成的，可以根据实际需求进行更改。而完成另外一个parse方法则是这个文件中最为关键的一步。parse 是 Scrapy 中的默认解析方法，爬虫启动后，Scrapy 会自动下载 start_urls 中的页面，并将响应传递给这个方法。在这里，我们会使用 XPath 来提取电影信息。（这些与requests的获取响应数据类似）
+
+
+首先使用 Selector 对页面进行解析。
+
+
+
+然后使用 XPath 提取页面中所有电影的列表，遍历每部电影并提取需要的字段信息，如电影的排名、名称、简介、评分等。
+
+
+
+最后通过 yield 返回提取到的数据。def parse(self, response): sel = Selector(response) # 使用 Selector 解析 HTML 响应movie_items = sel.xpath(&#x27;//div[@class=&quot;article&quot;]//ol[@class=&quot;grid_view&quot;]/li&#x27;) # 提取所有电影条目
+获得页面数据列表后就需要对其进行遍历,根据先前在items中已经建立好的对象from douban.items import DoubanItem#并且留意整个项目代码希望是完整独立的，不要嵌套在别的文件夹中，这会导致引用包时出现错误for movie in movie_items:      item = DoubanItem()  # 创建 item 实例      # 提取电影信息      item[&#x27;rank&#x27;] = movie.xpath(&#x27;.//div[@class=&quot;pic&quot;]/em/text()&#x27;).extract_first()      item[&#x27;movie_name&#x27;] = movie.xpath(&#x27;.//div[@class=&quot;hd&quot;]//span[1]/text()&#x27;).extract_first()      item[&#x27;movie_quote&#x27;] = movie.xpath(&#x27;.//div[@class=&quot;bd&quot;]/p[@class=&quot;quote&quot;]/span/text()&#x27;).extract_first(          default=&#x27;无&#x27;)      item[&#x27;picture&#x27;] = movie.xpath(&#x27;.//div[@class=&quot;pic&quot;]/a/img/@src&#x27;).extract_first()      item[&#x27;movie_rating&#x27;] = movie.xpath(&#x27;.//div[@class=&quot;bd&quot;]/div/span[2]/text()&#x27;).extract_first()      item[&#x27;evaluators&#x27;] = movie.xpath(&#x27;.//div[@class=&quot;bd&quot;]/div/span[4]/text()&#x27;).extract_first()        yield item  # 返回 item
+由于这样获得数据仅仅是一页的数据，所以我们还需要进行分页处理，确保获得所有的数据。豆瓣电影的 Top 250 列表分成了 10 页，每页显示 25 部电影。在爬取完第一页后，我们需要继续爬取剩下的页面。通过提取页面底部的“下一页”链接，来实现分页抓取。next_link = sel.xpath(&#x27;//span[@class=&quot;next&quot;]/link/@href&#x27;).extract_first()  if next_link:      yield Request(url=response.urljoin(next_link), callback=self.parse)
+如果你习惯于cmd可以不用这个代码，但是如果你习惯于直接用pycharm去运行程序，须在代码中添加from scrapy import cmdlineif __name__ == &#x27;__main__&#x27;:      #所写的‘db’是与上述的name相同      cmdline.execute(&#x27;scrapy crawl db&#x27;.split())
+
+
+
+下述为db.py的完整代码
+import scrapy  from scrapy import Selector,Request  from scrapy import cmdline  from douban.items import DoubanItem    class DbSpider(scrapy.Spider):      name = &quot;db&quot;      allowed_domains = [&quot;movie.douban.com&quot;]  # 允许的域名范围      start_urls = [&quot;https://movie.douban.com/top250&quot;]  # 爬虫从这个 URL 开始抓取        def parse(self, response):          sel = Selector(response)  # 解析页面          movie_items = sel.xpath(&#x27;//div[@class=&quot;article&quot;]//ol[@class=&quot;grid_view&quot;]/li&#x27;)  # 获取电影条目列表            for movie in movie_items:              item = DoubanItem()  # 创建 item 实例              # 提取电影信息              item[&#x27;rank&#x27;] = movie.xpath(&#x27;.//div[@class=&quot;pic&quot;]/em/text()&#x27;).extract_first()              item[&#x27;movie_name&#x27;] = movie.xpath(&#x27;.//div[@class=&quot;hd&quot;]//span[1]/text()&#x27;).extract_first()              item[&#x27;movie_quote&#x27;] = movie.xpath(&#x27;.//div[@class=&quot;bd&quot;]/p[@class=&quot;quote&quot;]/span/text()&#x27;).extract_first(                  default=&#x27;无&#x27;)              item[&#x27;picture&#x27;] = movie.xpath(&#x27;.//div[@class=&quot;pic&quot;]/a/img/@src&#x27;).extract_first()              item[&#x27;movie_rating&#x27;] = movie.xpath(&#x27;.//div[@class=&quot;bd&quot;]/div/span[2]/text()&#x27;).extract_first()              item[&#x27;evaluators&#x27;] = movie.xpath(&#x27;.//div[@class=&quot;bd&quot;]/div/span[4]/text()&#x27;).extract_first()                yield item  # 返回 item          # 处理分页          next_link = sel.xpath(&#x27;//span[@class=&quot;next&quot;]/link/@href&#x27;).extract_first()          if next_link:              yield Request(url=response.urljoin(next_link), callback=self.parse)        if __name__ == &#x27;__main__&#x27;:      #所写的‘db’是与上述的name相同      cmdline.execute(&#x27;scrapy crawl db&#x27;.split())
+
+2.3 pipelines.py在 Scrapy 中，pipelines.py 文件用于处理爬取到的数据。这里，我们要将抓取到的豆瓣电影数据保存到 Excel 文件中。为了实现这一点，我们会使用 Python 的 openpyxl 库，它是一个专门用于处理 Excel 文件的库。DoubanPipeline类DoubanPipeline 类将处理从爬虫传递过来的数据，并将这些数据写入 Excel 文件。Scrapy 中的 Pipeline 类通常有三个方法：open_spider、process_item 和 close_spider。
+
+**open_spider**：当爬虫启动时调用，一般用于初始化一些资源。
+**process_item**：每当爬虫抓取到一个数据项（item）时，都会调用此方法来处理该项数据。
+**close_spider**：当爬虫结束时调用，用于保存文件或释放资源。  import openpyxl  # 导入处理 Excel 文件的库  from .items import DoubanItem  # 导入定义好的 Item 数据结构    class DoubanPipeline:      def __init__(self):          &quot;&quot;&quot;          初始化方法，在爬虫开始时被调用，初始化 Excel 工作簿和表格。          &quot;&quot;&quot;        self.wb = openpyxl.Workbook()  # 创建一个新的 Excel 工作簿          self.sheet = self.wb.active  # 获取工作簿的活动表格          self.sheet.title = &#x27;豆瓣电影Top250&#x27;  # 设置表格的标题          # 在第一行写入表头，表示每列的意义          self.sheet.append((&#x27;电影排名&#x27;, &#x27;电影名称&#x27;, &#x27;电影名言&#x27;, &#x27;电影评分&#x27;, &#x27;观影人数&#x27;, &#x27;电影海报&#x27;))        def open_spider(self, spider):          &quot;&quot;&quot;          当爬虫被启动时调用该方法。          :param spider: 当前运行的爬虫对象          &quot;&quot;&quot;        print(&#x27;开始爬虫...&#x27;)  # 可以选择在控制台输出提示信息，表示爬虫开始运行        def process_item(self, item: DoubanItem, spider):          &quot;&quot;&quot;          处理每个爬取到的数据项（item），将其保存到 Excel 文件中。          :param item: 爬取到的电影数据          :param spider: 当前运行的爬虫对象          :return: 返回处理后的 item        &quot;&quot;&quot;        # 将每部电影的信息以一行的形式写入 Excel        self.sheet.append((              item[&#x27;rank&#x27;],  # 电影排名              item[&#x27;movie_name&#x27;],  # 电影名称              item[&#x27;movie_quote&#x27;],  # 电影名言              item[&#x27;movie_rating&#x27;],  # 电影评分              item[&#x27;evaluators&#x27;] ,  # 观影人数              item[&#x27;picture&#x27;] # 电影海报链接            ))          # 返回 item 是 Scrapy Pipeline 的标准流程，方便后续可能有其他 pipeline 处理          return item        def close_spider(self, spider):          &quot;&quot;&quot;          当爬虫关闭时调用，保存 Excel 文件。          :param spider: 当前运行的爬虫对象          &quot;&quot;&quot;        print(&quot;爬虫结束....&quot;)  # 输出爬虫结束的提示          # 保存 Excel 文件到指定路径          self.wb.save(&#x27;豆瓣电影数据.xlsx&#x27;)
+
+2.4 setting.pysetting中是scrapy中的全局配置文件，我会选择出几个较为重要的进行解释说明。
+BOT_NAME = &quot;douban&quot;    SPIDER_MODULES = [&quot;douban.spiders&quot;]  NEWSPIDER_MODULE = &quot;douban.spiders&quot;
+
+BOT_NAME定义了scrapy项目的名称，scrapy会通过这个名称去识别项目，一般默认即可。
+SPIDER_MODULES定义了爬虫的存放路径
+NEWSPIDER_MODULE 定义了新爬虫的生成的存放路径
+
+# Obey robots.txt rules  ROBOTSTXT_OBEY = False
+ROBOT协议默认关闭即可ps: 虽然机器人协议禁止了，但实际开发中仍需要遵循网站爬虫规则，避免给网站带来过多的负担。
+# See also autothrottle settings and docs  DOWNLOAD_DELAY = 3
+下载延迟，通过定义每个请求之间的时间间隔，来避免触发网站的反爬虫机制
+DEFAULT_REQUEST_HEADERS = &#123;      &#x27;accept&#x27;: &#x27;application/json, text/plain, */*&#x27;,      &#x27;accept-language&#x27;: &#x27;zh-CN,zh;q=0.9&#x27;,      &#x27;origin&#x27;: &#x27;https://movie.douban.com&#x27;,      &#x27;priority&#x27;: &#x27;u=1, i&#x27;,      &#x27;referer&#x27;: &#x27;https://movie.douban.com/explore&#x27;,      &#x27;sec-ch-ua&#x27;: &#x27;&quot;Chromium&quot;;v=&quot;9&quot;, &quot;Not?A_Brand&quot;;v=&quot;8&quot;&#x27;,      &#x27;sec-ch-ua-mobile&#x27;: &#x27;?0&#x27;,      &#x27;sec-ch-ua-platform&#x27;: &#x27;&quot;Windows&quot;&#x27;,      &#x27;sec-fetch-dest&#x27;: &#x27;empty&#x27;,      &#x27;sec-fetch-mode&#x27;: &#x27;cors&#x27;,      &#x27;sec-fetch-site&#x27;: &#x27;same-site&#x27;,      &#x27;user-agent&#x27;: &#x27;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36 SLBrowser/9.0.6.2081 SLBChan/103 SLBVPV/64-bit&#x27;,    &#125;
+请求头，这个如果尝试过爬虫应该都不陌生，就是代码去访问网站时带的信息，具体怎么获取可以看我之前的文章，比较基础。
+ITEM_PIPELINES = &#123;     &quot;douban.pipelines.DoubanPipeline&quot;: 300,  &#125;
+重要，这是开启pipeline的代码，一定要开，不然pipelines就无法使用。300 是该 Pipeline 的优先级，数字越小优先级越高。这里我们设置为 300，表示优先处理该 Pipeline。
+# Set settings whose default value is deprecated to a future-proof value  TWISTED_REACTOR = &quot;twisted.internet.asyncioreactor.AsyncioSelectorReactor&quot;  FEED_EXPORT_ENCODING = &quot;utf-8&quot;
+REQUEST_FINGERPRINTER_IMPLEMENTATION 和 TWISTED_REACTOR，它们是 Scrapy 的内部配置，用于确保兼容性和性能优化。一般创建项目时默认生成，不需要改。然后在终端运行，或如我写的那样就可在pycharm直接运行，得到如下结果，
+]]></content>
+  </entry>
+  <entry>
     <title></title>
     <url>/css/transpancy.css</url>
     <content><![CDATA[/* 1. 容器对齐与间距 */

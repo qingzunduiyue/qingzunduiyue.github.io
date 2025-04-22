@@ -1,0 +1,397 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>python爬虫学习（四） | 青樽对月の小屋</title><meta name="author" content="青樽对月"><meta name="copyright" content="青樽对月"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="ffffff"><meta name="description" content="scrapy框架1. 概念在网络数据采集的领域，Scrapy无疑是一款强大而高效的爬虫框架。它为用户提供了丰富的功能，能够快速抓取和解析网站数据。无论是简单的网页抓取还是复杂的数据提取，Scrapy都能助你一臂之力。    requests scrapy    页面级爬虫 网站级爬虫   功能库 框架   并发性考虑不足，性能较差 并发性好，性能高   重点在于页面下载 重点在于爬虫结构   定制">
+<meta property="og:type" content="article">
+<meta property="og:title" content="python爬虫学习（四）">
+<meta property="og:url" content="https://cyter.top/2025/04/21/%E7%88%AC%E8%99%AB%EF%BC%88%E5%9B%9B%EF%BC%89/index.html">
+<meta property="og:site_name" content="青樽对月の小屋">
+<meta property="og:description" content="scrapy框架1. 概念在网络数据采集的领域，Scrapy无疑是一款强大而高效的爬虫框架。它为用户提供了丰富的功能，能够快速抓取和解析网站数据。无论是简单的网页抓取还是复杂的数据提取，Scrapy都能助你一臂之力。    requests scrapy    页面级爬虫 网站级爬虫   功能库 框架   并发性考虑不足，性能较差 并发性好，性能高   重点在于页面下载 重点在于爬虫结构   定制">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://image-1352611653.cos.ap-guangzhou.myqcloud.com/img/wallhaven-x8qoz3.png">
+<meta property="article:published_time" content="2025-04-21T11:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-22T00:07:32.003Z">
+<meta property="article:author" content="青樽对月">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://image-1352611653.cos.ap-guangzhou.myqcloud.com/img/wallhaven-x8qoz3.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "python爬虫学习（四）",
+  "url": "https://cyter.top/2025/04/21/%E7%88%AC%E8%99%AB%EF%BC%88%E5%9B%9B%EF%BC%89/",
+  "image": "https://image-1352611653.cos.ap-guangzhou.myqcloud.com/img/wallhaven-x8qoz3.png",
+  "datePublished": "2025-04-21T11:00:00.000Z",
+  "dateModified": "2025-04-22T00:07:32.003Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "青樽对月",
+      "url": "https://cyter.top/"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://cyter.top/2025/04/21/%E7%88%AC%E8%99%AB%EF%BC%88%E5%9B%9B%EF%BC%89/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!true && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":true,"top_n_per_article":1,"unescape":true,"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: true,
+    post: true
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: {"limitCount":50,"languages":{"author":"作者: 青樽对月","link":"链接: ","source":"来源: 青樽对月の小屋","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。"}},
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"已切换为繁体中文","cht_to_chs":"已切换为简体中文","day_to_night":"已切换为深色模式","night_to_day":"已切换为浅色模式","bgLight":"#49b1f5","bgDark":"#1f1f1f","position":"top-right"},
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: true,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'python爬虫学习（四）',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><link rel="stylesheet" href="/css/custom.css" media="defer" onload="this.media='all'"><link rel="stylesheet" href="/css/transpancy.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg" style="background-image: url(https://image-1352611653.cos.ap-guangzhou.myqcloud.com/wallhaven-z8l37o.jpg);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://image-1352611653.cos.ap-guangzhou.myqcloud.com/20200917125650_thSrZ.jpeg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">5</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><span class="site-page group hide"><i class="fa-fw fas fa-book"></i><span> 小说（自创）</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/%E5%9B%9E%E5%BF%86/"><i class="fa-fw fas fa-book"></i><span> 隐藏在时光里的回忆</span></a></li><li><a class="site-page child" href="/%E9%86%89%E6%AC%A2%E8%A1%8C/"><i class="fa-fw fas fa-book"></i><span> 醉欢行</span></a></li></ul></div><div class="menus_item"><span class="site-page group hide"><i class="fa-fw fas fa-list"></i><span> 列表</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li><li><a class="site-page child" href="/poem/"><i class="fa-fw fas fa-pen-fancy"></i><span> 诗词</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/comments/"><i class="fa-fw fas fa-envelope-open"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友情链接</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于我</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(https://image-1352611653.cos.ap-guangzhou.myqcloud.com/img/wallhaven-x8qoz3.png);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">青樽对月の小屋</span></a><a class="nav-page-title" href="/"><span class="site-name">python爬虫学习（四）</span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><span class="site-page group hide"><i class="fa-fw fas fa-book"></i><span> 小说（自创）</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/%E5%9B%9E%E5%BF%86/"><i class="fa-fw fas fa-book"></i><span> 隐藏在时光里的回忆</span></a></li><li><a class="site-page child" href="/%E9%86%89%E6%AC%A2%E8%A1%8C/"><i class="fa-fw fas fa-book"></i><span> 醉欢行</span></a></li></ul></div><div class="menus_item"><span class="site-page group hide"><i class="fa-fw fas fa-list"></i><span> 列表</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li><li><a class="site-page child" href="/poem/"><i class="fa-fw fas fa-pen-fancy"></i><span> 诗词</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/comments/"><i class="fa-fw fas fa-envelope-open"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友情链接</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于我</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">python爬虫学习（四）</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-04-21T11:00:00.000Z" title="发表于 2025-04-21 19:00:00">2025-04-21</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-04-22T00:07:32.003Z" title="更新于 2025-04-22 08:07:32">2025-04-22</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">总字数:</span><span class="word-count">2.9k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>11分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h1 id="scrapy框架"><a href="#scrapy框架" class="headerlink" title="scrapy框架"></a>scrapy框架</h1><h2 id="1-概念"><a href="#1-概念" class="headerlink" title="1. 概念"></a>1. 概念</h2><p>在网络<a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=%E6%95%B0%E6%8D%AE%E9%87%87%E9%9B%86&spm=1001.2101.3001.7020">数据采集</a>的领域，Scrapy无疑是一款强大而高效的爬虫框架。它为用户提供了丰富的功能，能够快速抓取和解析网站数据。无论是简单的网页抓取还是复杂的数据提取，Scrapy都能助你一臂之力。</p>
+<table>
+<thead>
+<tr>
+<th align="center">requests</th>
+<th align="center">scrapy</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">页面级爬虫</td>
+<td align="center">网站级爬虫</td>
+</tr>
+<tr>
+<td align="center">功能库</td>
+<td align="center">框架</td>
+</tr>
+<tr>
+<td align="center">并发性考虑不足，性能较差</td>
+<td align="center">并发性好，性能高</td>
+</tr>
+<tr>
+<td align="center">重点在于页面下载</td>
+<td align="center">重点在于爬虫结构</td>
+</tr>
+<tr>
+<td align="center">定制灵活</td>
+<td align="center">一般制定灵活，深度制定困难</td>
+</tr>
+<tr>
+<td align="center">上手十分简单</td>
+<td align="center">入门稍难</td>
+</tr>
+<tr>
+<td align="center">相关图如下：</td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://image-1352611653.cos.ap-guangzhou.myqcloud.com/img/20181121211144756.png" alt="20181121211144756.png"></td>
+<td align="center"></td>
+</tr>
+</tbody></table>
+<ul>
+<li><strong>Spiders</strong>：中文可以称为蜘蛛，Spiders 是一个复数的统称，其可以对应多个 Spider，每个 Spider 里面定义了站点的爬取逻辑和页面的解析规则。</li>
+<li><strong>Scrapy Engine</strong>：引擎，是整个框架的核心。可以理解为整个框架的中央处理器(类似人的大脑)，负责数据的流转和逻辑的处理。</li>
+<li><strong>Scheduler</strong>：调度器，它用来接受 Engine 发过来的 Request 并将其加入队列中，同时也可以将 Request 发回给 Engine 供 Downloader 执行</li>
+<li><strong>Downloader</strong>：下载器，完成向服务器发送请求，然后拿到响应的过程，并发送给Egine</li>
+<li><strong>Item pipeline</strong>：管道，用于处理抽取的数据，例如数据清洗、保存到数据库等。</li>
+<li><strong>Item</strong>：它是一个抽象的数据结构，所以在图中没有体现出来，它定义了爬取结果的数据结构，爬取的数据会被赋值成 Item 对象。</li>
+</ul>
+<h2 id="2-豆瓣电影爬取"><a href="#2-豆瓣电影爬取" class="headerlink" title="2.豆瓣电影爬取"></a>2.豆瓣电影爬取</h2><p>网址：<a target="_blank" rel="noopener" href="https://movie.douban.com/">https://movie.douban.com/</a><br>先下载scrapy相关</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install scrapy</span><br></pre></td></tr></table></figure>
+<p>下载完成后，先创建一个scrapy项目，在你想要创建的文件夹中cmd打开，并输入</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scrapy startproject 你的项目名</span><br></pre></td></tr></table></figure>
+<p>之后cmd’中会提示你进行</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cd 你的项目名</span><br><span class="line">scrapy genspider example example.com </span><br><span class="line">#example example.com 也是需要进行修改的，并且不能和项目名一致，且这个注释不能复制到cmd中</span><br></pre></td></tr></table></figure>
+<p>创建完项目之后，用pycharm打开即可，之后可以先去分析网址，我认为这一步是尤为重要的，尤其是在scrapy框架此类工具帮助下，代码的书写越来越简单，对网页的分析占比在一次爬虫任务中更为重要。<br><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://image-1352611653.cos.ap-guangzhou.myqcloud.com/img/20250421225137701.png" alt="image.png"></p>
+<h3 id="2-1-items-py"><a href="#2-1-items-py" class="headerlink" title="2.1 items.py"></a>2.1 items.py</h3><p>通过开发者模式将想要爬取的数据进行定位，确定要爬取哪些信息，然后在items.py中写入对应的对象。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">DoubanItem</span>(scrapy.Item):  </span><br><span class="line">    rank = scrapy.Field()  <span class="comment"># 电影排名  </span></span><br><span class="line">    movie_name = scrapy.Field() <span class="comment">#电影名称  </span></span><br><span class="line">    movie_quote = scrapy.Field()  <span class="comment"># 电影名言  </span></span><br><span class="line">    picture = scrapy.Field()  <span class="comment"># 电影海报链接  </span></span><br><span class="line">    movie_rating = scrapy.Field()  <span class="comment"># 电影评分  </span></span><br><span class="line">    evaluators = scrapy.Field()  <span class="comment"># 评价人数</span></span><br></pre></td></tr></table></figure>
+<h3 id="2-2-db-py-（自己命名的那个）"><a href="#2-2-db-py-（自己命名的那个）" class="headerlink" title="2.2 db.py （自己命名的那个）"></a>2.2 db.py （自己命名的那个）</h3><p>完成items的代码后，开始常规上的第一步，也就是对你的db.py进行编写代码</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">name = <span class="string">&quot;db&quot;</span>  </span><br><span class="line">allowed_domains = [<span class="string">&quot;movie.douban.com&quot;</span>]  <span class="comment"># 允许的域名范围  </span></span><br><span class="line">start_urls = [<span class="string">&quot;https://movie.douban.com/top250&quot;</span>]  <span class="comment"># 爬虫从这个 URL 开始抓取</span></span><br></pre></td></tr></table></figure>
+<p>上述这个代码是你在先前scrapy genspider example example.com 时就会默认生成的，可以根据实际需求进行更改。<br>而完成另外一个parse方法则是这个文件中最为关键的一步。<br><code>parse</code> 是 Scrapy 中的默认解析方法，爬虫启动后，Scrapy 会自动下载 <code>start_urls</code> 中的页面，并将响应传递给这个方法。在这里，我们会使用 XPath 来提取电影信息。<strong>（这些与requests的获取响应数据类似）</strong></p>
+<ul>
+<li><ol>
+<li>首先使用 <code>Selector</code> 对页面进行解析。</li>
+</ol>
+</li>
+<li><ol start="2">
+<li>然后使用 XPath 提取页面中所有电影的列表，遍历每部电影并提取需要的字段信息，如电影的排名、名称、简介、评分等。</li>
+</ol>
+</li>
+<li><ol start="3">
+<li>最后通过 <code>yield</code> 返回提取到的数据。<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">parse</span>(<span class="params">self, response</span>): sel = Selector(response) <span class="comment"># 使用 Selector 解析 HTML 响应</span></span><br><span class="line">movie_items = sel.xpath(<span class="string">&#x27;//div[@class=&quot;article&quot;]//ol[@class=&quot;grid_view&quot;]/li&#x27;</span>) <span class="comment"># 提取所有电影条目</span></span><br></pre></td></tr></table></figure>
+获得页面数据列表后就需要对其进行遍历,根据先前在items中已经建立好的对象<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> douban.items <span class="keyword">import</span> DoubanItem</span><br><span class="line"><span class="comment">#并且留意整个项目代码希望是完整独立的，不要嵌套在别的文件夹中，这会导致引用包时出现错误</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> movie <span class="keyword">in</span> movie_items:  </span><br><span class="line">    item = DoubanItem()  <span class="comment"># 创建 item 实例  </span></span><br><span class="line">    <span class="comment"># 提取电影信息  </span></span><br><span class="line">    item[<span class="string">&#x27;rank&#x27;</span>] = movie.xpath(<span class="string">&#x27;.//div[@class=&quot;pic&quot;]/em/text()&#x27;</span>).extract_first()  </span><br><span class="line">    item[<span class="string">&#x27;movie_name&#x27;</span>] = movie.xpath(<span class="string">&#x27;.//div[@class=&quot;hd&quot;]//span[1]/text()&#x27;</span>).extract_first()  </span><br><span class="line">    item[<span class="string">&#x27;movie_quote&#x27;</span>] = movie.xpath(<span class="string">&#x27;.//div[@class=&quot;bd&quot;]/p[@class=&quot;quote&quot;]/span/text()&#x27;</span>).extract_first(  </span><br><span class="line">        default=<span class="string">&#x27;无&#x27;</span>)  </span><br><span class="line">    item[<span class="string">&#x27;picture&#x27;</span>] = movie.xpath(<span class="string">&#x27;.//div[@class=&quot;pic&quot;]/a/img/@src&#x27;</span>).extract_first()  </span><br><span class="line">    item[<span class="string">&#x27;movie_rating&#x27;</span>] = movie.xpath(<span class="string">&#x27;.//div[@class=&quot;bd&quot;]/div/span[2]/text()&#x27;</span>).extract_first()  </span><br><span class="line">    item[<span class="string">&#x27;evaluators&#x27;</span>] = movie.xpath(<span class="string">&#x27;.//div[@class=&quot;bd&quot;]/div/span[4]/text()&#x27;</span>).extract_first()  </span><br><span class="line">  </span><br><span class="line">    <span class="keyword">yield</span> item  <span class="comment"># 返回 item</span></span><br></pre></td></tr></table></figure>
+由于这样获得数据仅仅是一页的数据，所以我们还需要进行分页处理，确保获得所有的数据。豆瓣电影的 Top 250 列表分成了 10 页，每页显示 25 部电影。在爬取完第一页后，我们需要继续爬取剩下的页面。通过提取页面底部的“下一页”链接，来实现分页抓取。<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">next_link = sel.xpath(<span class="string">&#x27;//span[@class=&quot;next&quot;]/link/@href&#x27;</span>).extract_first()  </span><br><span class="line"><span class="keyword">if</span> next_link:  </span><br><span class="line">    <span class="keyword">yield</span> Request(url=response.urljoin(next_link), callback=<span class="variable language_">self</span>.parse)</span><br></pre></td></tr></table></figure>
+如果你习惯于cmd可以不用这个代码，但是如果你习惯于直接用pycharm去运行程序，须在代码中添加<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> scrapy <span class="keyword">import</span> cmdline</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:  </span><br><span class="line">    <span class="comment">#所写的‘db’是与上述的name相同  </span></span><br><span class="line">    cmdline.execute(<span class="string">&#x27;scrapy crawl db&#x27;</span>.split())</span><br></pre></td></tr></table></figure></li>
+</ol>
+</li>
+</ul>
+<p>下述为db.py的完整代码</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> scrapy  </span><br><span class="line"><span class="keyword">from</span> scrapy <span class="keyword">import</span> Selector,Request  </span><br><span class="line"><span class="keyword">from</span> scrapy <span class="keyword">import</span> cmdline  </span><br><span class="line"><span class="keyword">from</span> douban.items <span class="keyword">import</span> DoubanItem  </span><br><span class="line">  </span><br><span class="line"><span class="keyword">class</span> <span class="title class_">DbSpider</span>(scrapy.Spider):  </span><br><span class="line">    name = <span class="string">&quot;db&quot;</span>  </span><br><span class="line">    allowed_domains = [<span class="string">&quot;movie.douban.com&quot;</span>]  <span class="comment"># 允许的域名范围  </span></span><br><span class="line">    start_urls = [<span class="string">&quot;https://movie.douban.com/top250&quot;</span>]  <span class="comment"># 爬虫从这个 URL 开始抓取  </span></span><br><span class="line">  </span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">parse</span>(<span class="params">self, response</span>):  </span><br><span class="line">        sel = Selector(response)  <span class="comment"># 解析页面  </span></span><br><span class="line">        movie_items = sel.xpath(<span class="string">&#x27;//div[@class=&quot;article&quot;]//ol[@class=&quot;grid_view&quot;]/li&#x27;</span>)  <span class="comment"># 获取电影条目列表  </span></span><br><span class="line">  </span><br><span class="line">        <span class="keyword">for</span> movie <span class="keyword">in</span> movie_items:  </span><br><span class="line">            item = DoubanItem()  <span class="comment"># 创建 item 实例  </span></span><br><span class="line">            <span class="comment"># 提取电影信息  </span></span><br><span class="line">            item[<span class="string">&#x27;rank&#x27;</span>] = movie.xpath(<span class="string">&#x27;.//div[@class=&quot;pic&quot;]/em/text()&#x27;</span>).extract_first()  </span><br><span class="line">            item[<span class="string">&#x27;movie_name&#x27;</span>] = movie.xpath(<span class="string">&#x27;.//div[@class=&quot;hd&quot;]//span[1]/text()&#x27;</span>).extract_first()  </span><br><span class="line">            item[<span class="string">&#x27;movie_quote&#x27;</span>] = movie.xpath(<span class="string">&#x27;.//div[@class=&quot;bd&quot;]/p[@class=&quot;quote&quot;]/span/text()&#x27;</span>).extract_first(  </span><br><span class="line">                default=<span class="string">&#x27;无&#x27;</span>)  </span><br><span class="line">            item[<span class="string">&#x27;picture&#x27;</span>] = movie.xpath(<span class="string">&#x27;.//div[@class=&quot;pic&quot;]/a/img/@src&#x27;</span>).extract_first()  </span><br><span class="line">            item[<span class="string">&#x27;movie_rating&#x27;</span>] = movie.xpath(<span class="string">&#x27;.//div[@class=&quot;bd&quot;]/div/span[2]/text()&#x27;</span>).extract_first()  </span><br><span class="line">            item[<span class="string">&#x27;evaluators&#x27;</span>] = movie.xpath(<span class="string">&#x27;.//div[@class=&quot;bd&quot;]/div/span[4]/text()&#x27;</span>).extract_first()  </span><br><span class="line">  </span><br><span class="line">            <span class="keyword">yield</span> item  <span class="comment"># 返回 item  </span></span><br><span class="line">        <span class="comment"># 处理分页  </span></span><br><span class="line">        next_link = sel.xpath(<span class="string">&#x27;//span[@class=&quot;next&quot;]/link/@href&#x27;</span>).extract_first()  </span><br><span class="line">        <span class="keyword">if</span> next_link:  </span><br><span class="line">            <span class="keyword">yield</span> Request(url=response.urljoin(next_link), callback=<span class="variable language_">self</span>.parse)  </span><br><span class="line">  </span><br><span class="line">  </span><br><span class="line">  </span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:  </span><br><span class="line">    <span class="comment">#所写的‘db’是与上述的name相同  </span></span><br><span class="line">    cmdline.execute(<span class="string">&#x27;scrapy crawl db&#x27;</span>.split())</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-3-pipelines-py"><a href="#2-3-pipelines-py" class="headerlink" title="2.3 pipelines.py"></a>2.3 pipelines.py</h3><p>在 Scrapy 中，<code>pipelines.py</code> 文件用于处理爬取到的数据。这里，我们要将抓取到的豆瓣电影数据保存到 Excel 文件中。为了实现这一点，我们会使用 Python 的 <code>openpyxl</code> 库，它是一个专门用于处理 Excel 文件的库。<br><strong>DoubanPipeline类</strong><br><code>DoubanPipeline</code> 类将处理从爬虫传递过来的数据，并将这些数据写入 Excel 文件。<code>Scrapy</code> 中的 <code>Pipeline</code> 类通常有三个方法：<code>open_spider</code>、<code>process_item</code> 和 <code>close_spider</code>。</p>
+<ul>
+<li>**<code>open_spider</code>**：当爬虫启动时调用，一般用于初始化一些资源。</li>
+<li>**<code>process_item</code>**：每当爬虫抓取到一个数据项（item）时，都会调用此方法来处理该项数据。</li>
+<li>**<code>close_spider</code>**：当爬虫结束时调用，用于保存文件或释放资源。<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">  </span><br><span class="line"><span class="keyword">import</span> openpyxl  <span class="comment"># 导入处理 Excel 文件的库  </span></span><br><span class="line"><span class="keyword">from</span> .items <span class="keyword">import</span> DoubanItem  <span class="comment"># 导入定义好的 Item 数据结构  </span></span><br><span class="line">  </span><br><span class="line"><span class="keyword">class</span> <span class="title class_">DoubanPipeline</span>:  </span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self</span>):  </span><br><span class="line">        <span class="string">&quot;&quot;&quot;  </span></span><br><span class="line"><span class="string">        初始化方法，在爬虫开始时被调用，初始化 Excel 工作簿和表格。  </span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span>        <span class="variable language_">self</span>.wb = openpyxl.Workbook()  <span class="comment"># 创建一个新的 Excel 工作簿  </span></span><br><span class="line">        <span class="variable language_">self</span>.sheet = <span class="variable language_">self</span>.wb.active  <span class="comment"># 获取工作簿的活动表格  </span></span><br><span class="line">        <span class="variable language_">self</span>.sheet.title = <span class="string">&#x27;豆瓣电影Top250&#x27;</span>  <span class="comment"># 设置表格的标题  </span></span><br><span class="line">        <span class="comment"># 在第一行写入表头，表示每列的意义  </span></span><br><span class="line">        <span class="variable language_">self</span>.sheet.append((<span class="string">&#x27;电影排名&#x27;</span>, <span class="string">&#x27;电影名称&#x27;</span>, <span class="string">&#x27;电影名言&#x27;</span>, <span class="string">&#x27;电影评分&#x27;</span>, <span class="string">&#x27;观影人数&#x27;</span>, <span class="string">&#x27;电影海报&#x27;</span>))  </span><br><span class="line">  </span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">open_spider</span>(<span class="params">self, spider</span>):  </span><br><span class="line">        <span class="string">&quot;&quot;&quot;  </span></span><br><span class="line"><span class="string">        当爬虫被启动时调用该方法。  </span></span><br><span class="line"><span class="string">        :param spider: 当前运行的爬虫对象  </span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span>        <span class="built_in">print</span>(<span class="string">&#x27;开始爬虫...&#x27;</span>)  <span class="comment"># 可以选择在控制台输出提示信息，表示爬虫开始运行  </span></span><br><span class="line">  </span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">process_item</span>(<span class="params">self, item: DoubanItem, spider</span>):  </span><br><span class="line">        <span class="string">&quot;&quot;&quot;  </span></span><br><span class="line"><span class="string">        处理每个爬取到的数据项（item），将其保存到 Excel 文件中。  </span></span><br><span class="line"><span class="string">        :param item: 爬取到的电影数据  </span></span><br><span class="line"><span class="string">        :param spider: 当前运行的爬虫对象  </span></span><br><span class="line"><span class="string">        :return: 返回处理后的 item        &quot;&quot;&quot;</span>        <span class="comment"># 将每部电影的信息以一行的形式写入 Excel        self.sheet.append((  </span></span><br><span class="line">            item[<span class="string">&#x27;rank&#x27;</span>],  <span class="comment"># 电影排名  </span></span><br><span class="line">            item[<span class="string">&#x27;movie_name&#x27;</span>],  <span class="comment"># 电影名称  </span></span><br><span class="line">            item[<span class="string">&#x27;movie_quote&#x27;</span>],  <span class="comment"># 电影名言  </span></span><br><span class="line">            item[<span class="string">&#x27;movie_rating&#x27;</span>],  <span class="comment"># 电影评分  </span></span><br><span class="line">            item[<span class="string">&#x27;evaluators&#x27;</span>] ,  <span class="comment"># 观影人数  </span></span><br><span class="line">            item[<span class="string">&#x27;picture&#x27;</span>] <span class="comment"># 电影海报链接  </span></span><br><span class="line">  </span><br><span class="line">        ))  </span><br><span class="line">        <span class="comment"># 返回 item 是 Scrapy Pipeline 的标准流程，方便后续可能有其他 pipeline 处理  </span></span><br><span class="line">        <span class="keyword">return</span> item  </span><br><span class="line">  </span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">close_spider</span>(<span class="params">self, spider</span>):  </span><br><span class="line">        <span class="string">&quot;&quot;&quot;  </span></span><br><span class="line"><span class="string">        当爬虫关闭时调用，保存 Excel 文件。  </span></span><br><span class="line"><span class="string">        :param spider: 当前运行的爬虫对象  </span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span>        <span class="built_in">print</span>(<span class="string">&quot;爬虫结束....&quot;</span>)  <span class="comment"># 输出爬虫结束的提示  </span></span><br><span class="line">        <span class="comment"># 保存 Excel 文件到指定路径  </span></span><br><span class="line">        <span class="variable language_">self</span>.wb.save(<span class="string">&#x27;豆瓣电影数据.xlsx&#x27;</span>)</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="2-4-setting-py"><a href="#2-4-setting-py" class="headerlink" title="2.4 setting.py"></a>2.4 setting.py</h3><p>setting中是scrapy中的全局配置文件，我会选择出几个较为重要的进行解释说明。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">BOT_NAME = <span class="string">&quot;douban&quot;</span>  </span><br><span class="line">  </span><br><span class="line">SPIDER_MODULES = [<span class="string">&quot;douban.spiders&quot;</span>]  </span><br><span class="line">NEWSPIDER_MODULE = <span class="string">&quot;douban.spiders&quot;</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>BOT_NAME</code>定义了scrapy项目的名称，scrapy会通过这个名称去识别项目，一般默认即可。</li>
+<li><code>SPIDER_MODULES</code>定义了爬虫的存放路径</li>
+<li><code>NEWSPIDER_MODULE</code> 定义了新爬虫的生成的存放路径</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Obey robots.txt rules  </span></span><br><span class="line">ROBOTSTXT_OBEY = <span class="literal">False</span></span><br></pre></td></tr></table></figure>
+<p>ROBOT协议默认关闭即可<br>ps: 虽然机器人协议禁止了，但实际开发中仍需要遵循网站爬虫规则，避免给网站带来过多的负担。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># See also autothrottle settings and docs  </span></span><br><span class="line">DOWNLOAD_DELAY = <span class="number">3</span></span><br></pre></td></tr></table></figure>
+<p>下载延迟，通过定义每个请求之间的时间间隔，来避免触发网站的反爬虫机制</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">DEFAULT_REQUEST_HEADERS = &#123;  </span><br><span class="line">    <span class="string">&#x27;accept&#x27;</span>: <span class="string">&#x27;application/json, text/plain, */*&#x27;</span>,  </span><br><span class="line">    <span class="string">&#x27;accept-language&#x27;</span>: <span class="string">&#x27;zh-CN,zh;q=0.9&#x27;</span>,  </span><br><span class="line">    <span class="string">&#x27;origin&#x27;</span>: <span class="string">&#x27;https://movie.douban.com&#x27;</span>,  </span><br><span class="line">    <span class="string">&#x27;priority&#x27;</span>: <span class="string">&#x27;u=1, i&#x27;</span>,  </span><br><span class="line">    <span class="string">&#x27;referer&#x27;</span>: <span class="string">&#x27;https://movie.douban.com/explore&#x27;</span>,  </span><br><span class="line">    <span class="string">&#x27;sec-ch-ua&#x27;</span>: <span class="string">&#x27;&quot;Chromium&quot;;v=&quot;9&quot;, &quot;Not?A_Brand&quot;;v=&quot;8&quot;&#x27;</span>,  </span><br><span class="line">    <span class="string">&#x27;sec-ch-ua-mobile&#x27;</span>: <span class="string">&#x27;?0&#x27;</span>,  </span><br><span class="line">    <span class="string">&#x27;sec-ch-ua-platform&#x27;</span>: <span class="string">&#x27;&quot;Windows&quot;&#x27;</span>,  </span><br><span class="line">    <span class="string">&#x27;sec-fetch-dest&#x27;</span>: <span class="string">&#x27;empty&#x27;</span>,  </span><br><span class="line">    <span class="string">&#x27;sec-fetch-mode&#x27;</span>: <span class="string">&#x27;cors&#x27;</span>,  </span><br><span class="line">    <span class="string">&#x27;sec-fetch-site&#x27;</span>: <span class="string">&#x27;same-site&#x27;</span>,  </span><br><span class="line">    <span class="string">&#x27;user-agent&#x27;</span>: <span class="string">&#x27;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36 SLBrowser/9.0.6.2081 SLBChan/103 SLBVPV/64-bit&#x27;</span>,  </span><br><span class="line">  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>请求头，这个如果尝试过爬虫应该都不陌生，就是代码去访问网站时带的信息，具体怎么获取可以看我之前的文章，比较基础。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ITEM_PIPELINES = &#123;  </span><br><span class="line">   <span class="string">&quot;douban.pipelines.DoubanPipeline&quot;</span>: <span class="number">300</span>,  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>重要</strong>，这是开启<code>pipeline</code>的代码，一定要开，不然pipelines就无法使用。<code>300</code> 是该 Pipeline 的优先级，数字越小优先级越高。这里我们设置为 <code>300</code>，表示优先处理该 Pipeline。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Set settings whose default value is deprecated to a future-proof value  </span></span><br><span class="line">TWISTED_REACTOR = <span class="string">&quot;twisted.internet.asyncioreactor.AsyncioSelectorReactor&quot;</span>  </span><br><span class="line">FEED_EXPORT_ENCODING = <span class="string">&quot;utf-8&quot;</span></span><br></pre></td></tr></table></figure>
+<p><code>REQUEST_FINGERPRINTER_IMPLEMENTATION</code> 和 <code>TWISTED_REACTOR</code>，它们是 Scrapy 的内部配置，用于确保兼容性和性能优化。一般创建项目时默认生成，不需要改。<br>然后在终端运行，或如我写的那样就可在pycharm直接运行，得到如下结果，<br><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://image-1352611653.cos.ap-guangzhou.myqcloud.com/img/20250422080730019.png" alt="image.png"></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://cyter.top">青樽对月</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://cyter.top/2025/04/21/%E7%88%AC%E8%99%AB%EF%BC%88%E5%9B%9B%EF%BC%89/">https://cyter.top/2025/04/21/%E7%88%AC%E8%99%AB%EF%BC%88%E5%9B%9B%EF%BC%89/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="https://cyter.top" target="_blank">青樽对月の小屋</a>！</span></div></div><div class="tag_share"><div class="post-share"><div class="social-share" data-image="https://image-1352611653.cos.ap-guangzhou.myqcloud.com/img/wallhaven-x8qoz3.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related full-width" href="/2025/04/20/%E5%88%A9%E7%94%A8DrissionPge%E7%88%AC%E5%8F%96%E6%B7%98%E5%AE%9D%E6%95%B0%E6%8D%AE/" title="利用DrissionPge爬取淘宝数据"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://image-1352611653.cos.ap-guangzhou.myqcloud.com/img/wallhaven-6kv1ow_1920x1080.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">利用DrissionPge爬取淘宝数据</div></div><div class="info-2"><div class="info-item-1">本篇文章将利用DrissionPage完成淘宝商品数据爬取DrissionPage官网：https://drissionpage.cn/ 首先需要下载DrissionPage 1pip install DrissionPage 下载好之后首先要做的就是设置运行的浏览器 12345from DrissionPage import ChromiumOptions  #这是我自己的谷歌浏览器的地址path = r&quot;C:\Program Files\Google\Chrome\Application\chrome.exe&quot;    ChromiumOptions().set_browser_path(path).save() 这个代码运行成功后，之后都不用运行了 1....</div></div></div></a></nav><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div id="twikoo-wrap"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://image-1352611653.cos.ap-guangzhou.myqcloud.com/20200917125650_thSrZ.jpeg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">青樽对月</div><div class="author-info-description">博客</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">5</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/qingzunduiyue/qingzunduiyue.github.io"><i class="fab fa-github"></i><span>关注</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/qingzunduiyue" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:178148931@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">恭喜你发现了一个宝藏
+有疑问可在评论区或者加微信询问
+<div style="text-align: center; margin-top: 10px;">
+  <img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://image-1352611653.cos.ap-guangzhou.myqcloud.com/img/b24c8c4afbed83349fb20acc5a2722e.jpg" 
+      alt="二维码" 
+      style="width: 200px; height: auto; border: 1px solid #eee;">
+</div>
+</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#scrapy%E6%A1%86%E6%9E%B6"><span class="toc-number">1.</span> <span class="toc-text">scrapy框架</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E6%A6%82%E5%BF%B5"><span class="toc-number">1.1.</span> <span class="toc-text">1. 概念</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E8%B1%86%E7%93%A3%E7%94%B5%E5%BD%B1%E7%88%AC%E5%8F%96"><span class="toc-number">1.2.</span> <span class="toc-text">2.豆瓣电影爬取</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-items-py"><span class="toc-number">1.2.1.</span> <span class="toc-text">2.1 items.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-db-py-%EF%BC%88%E8%87%AA%E5%B7%B1%E5%91%BD%E5%90%8D%E7%9A%84%E9%82%A3%E4%B8%AA%EF%BC%89"><span class="toc-number">1.2.2.</span> <span class="toc-text">2.2 db.py （自己命名的那个）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-pipelines-py"><span class="toc-number">1.2.3.</span> <span class="toc-text">2.3 pipelines.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-4-setting-py"><span class="toc-number">1.2.4.</span> <span class="toc-text">2.4 setting.py</span></a></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2025/04/21/%E7%88%AC%E8%99%AB%EF%BC%88%E5%9B%9B%EF%BC%89/" title="python爬虫学习（四）"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://image-1352611653.cos.ap-guangzhou.myqcloud.com/img/wallhaven-x8qoz3.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="python爬虫学习（四）"/></a><div class="content"><a class="title" href="/2025/04/21/%E7%88%AC%E8%99%AB%EF%BC%88%E5%9B%9B%EF%BC%89/" title="python爬虫学习（四）">python爬虫学习（四）</a><time datetime="2025-04-21T11:00:00.000Z" title="发表于 2025-04-21 19:00:00">2025-04-21</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/04/20/%E5%88%A9%E7%94%A8DrissionPge%E7%88%AC%E5%8F%96%E6%B7%98%E5%AE%9D%E6%95%B0%E6%8D%AE/" title="利用DrissionPge爬取淘宝数据"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://image-1352611653.cos.ap-guangzhou.myqcloud.com/img/wallhaven-6kv1ow_1920x1080.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="利用DrissionPge爬取淘宝数据"/></a><div class="content"><a class="title" href="/2025/04/20/%E5%88%A9%E7%94%A8DrissionPge%E7%88%AC%E5%8F%96%E6%B7%98%E5%AE%9D%E6%95%B0%E6%8D%AE/" title="利用DrissionPge爬取淘宝数据">利用DrissionPge爬取淘宝数据</a><time datetime="2025-04-20T07:48:00.000Z" title="发表于 2025-04-20 15:48:00">2025-04-20</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/04/16/%E7%88%AC%E8%99%AB%EF%BC%88%E4%B8%89%EF%BC%89/" title="python爬虫学习（三）"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://image-1352611653.cos.ap-guangzhou.myqcloud.com/img/wallhaven-l89y2q.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="python爬虫学习（三）"/></a><div class="content"><a class="title" href="/2025/04/16/%E7%88%AC%E8%99%AB%EF%BC%88%E4%B8%89%EF%BC%89/" title="python爬虫学习（三）">python爬虫学习（三）</a><time datetime="2025-04-16T07:34:37.000Z" title="发表于 2025-04-16 15:34:37">2025-04-16</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/04/15/%E7%88%AC%E8%99%AB%EF%BC%88%E4%BA%8C%EF%BC%89/" title="python爬虫学习（二）"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://image-1352611653.cos.ap-guangzhou.myqcloud.com/img/wallhaven-g7og6e.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="python爬虫学习（二）"/></a><div class="content"><a class="title" href="/2025/04/15/%E7%88%AC%E8%99%AB%EF%BC%88%E4%BA%8C%EF%BC%89/" title="python爬虫学习（二）">python爬虫学习（二）</a><time datetime="2025-04-15T08:34:37.000Z" title="发表于 2025-04-15 16:34:37">2025-04-15</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/04/13/python%E7%88%AC%E8%99%AB/" title="python爬虫学习（一）"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://image-1352611653.cos.ap-guangzhou.myqcloud.com/img%2Fwallhaven-57vw73.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="python爬虫学习（一）"/></a><div class="content"><a class="title" href="/2025/04/13/python%E7%88%AC%E8%99%AB/" title="python爬虫学习（一）">python爬虫学习（一）</a><time datetime="2025-04-12T16:00:00.000Z" title="发表于 2025-04-13 00:00:00">2025-04-13</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url(https://image-1352611653.cos.ap-guangzhou.myqcloud.com/wallhaven-9mjoy1.png);"><div id="footer-wrap"><div class="copyright">&copy;2025 By 青樽对月</div><div class="footer_custom_text">欢迎来到我的博客 <br> 备案号:浙ICP备2025164162号-1</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="前往评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/instant.page/instantpage.min.js" type="module"></script><script src="https://cdn.jsdelivr.net/npm/vanilla-lazyload/dist/lazyload.iife.min.js"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script><div class="js-pjax"><script>(() => {
+  const isShuoshuo = GLOBAL_CONFIG_SITE.pageType === 'shuoshuo'
+  const option = null
+
+  const getCount = () => {
+    const countELement = document.getElementById('twikoo-count')
+    if(!countELement) return
+    twikoo.getCommentsCount({
+      envId: 'https://data.cyter.top',
+      region: '',
+      urls: [window.location.pathname],
+      includeReply: false
+    }).then(res => {
+      countELement.textContent = res[0].count
+    }).catch(err => {
+      console.error(err)
+    })
+  }
+
+  const init = (el = document, path = location.pathname) => {
+    twikoo.init({
+      el: el.querySelector('#twikoo-wrap'),
+      envId: 'https://data.cyter.top',
+      region: '',
+      onCommentLoaded: () => {
+        btf.loadLightbox(document.querySelectorAll('#twikoo .tk-content img:not(.tk-owo-emotion)'))
+      },
+      ...option,
+      path: isShuoshuo ? path : (option && option.path) || path
+    })
+
+    
+
+    isShuoshuo && (window.shuoshuoComment.destroyTwikoo = () => {
+      if (el.children.length) {
+        el.innerHTML = ''
+        el.classList.add('no-comment')
+      }
+    })
+  }
+
+  const loadTwikoo = (el, path) => {
+    if (typeof twikoo === 'object') setTimeout(() => init(el, path), 0)
+    else btf.getScript('https://cdn.jsdelivr.net/npm/twikoo/dist/twikoo.all.min.js').then(() => init(el, path))
+  }
+
+  if (isShuoshuo) {
+    'Twikoo' === 'Twikoo'
+      ? window.shuoshuoComment = { loadComment: loadTwikoo }
+      : window.loadOtherComment = loadTwikoo
+    return
+  }
+
+  if ('Twikoo' === 'Twikoo' || !true) {
+    if (true) btf.loadComment(document.getElementById('twikoo-wrap'), loadTwikoo)
+    else loadTwikoo()
+  } else {
+    window.loadOtherComment = loadTwikoo
+  }
+})()</script></div><script id="click-show-text" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/click-show-text.min.js" data-mobile="false" data-text="功德+1" data-fontsize="15px" data-random="false" async="async"></script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/metingjs/dist/Meting.min.js"></script><script>(() => {
+  const destroyAplayer = () => {
+    if (window.aplayers) {
+      for (let i = 0; i < window.aplayers.length; i++) {
+        if (!window.aplayers[i].options.fixed) {
+          window.aplayers[i].destroy()
+        }
+      }
+    }
+  }
+
+  const runMetingJS = () => {
+    typeof loadMeting === 'function' && document.getElementsByClassName('aplayer').length && loadMeting()
+  }
+
+  btf.addGlobalFn('pjaxSend', destroyAplayer, 'destroyAplayer')
+  btf.addGlobalFn('pjaxComplete', loadMeting, 'runMetingJS')
+})()</script><script src="https://cdn.jsdelivr.net/npm/pjax/pjax.min.js"></script><script>(() => {
+  const pjaxSelectors = ["head > title","#config-diff","#body-wrap","#rightside-config-hide","#rightside-config-show",".js-pjax"]
+
+  window.pjax = new Pjax({
+    elements: 'a:not([target="_blank"]):not([href="/music/"]):not([href="/no-pjax/"])',
+    selectors: pjaxSelectors,
+    cacheBust: false,
+    analytics: false,
+    scrollRestoration: false
+  })
+
+  const triggerPjaxFn = (val) => {
+    if (!val) return
+    Object.values(val).forEach(fn => fn())
+  }
+
+  document.addEventListener('pjax:send', () => {
+    // removeEventListener
+    btf.removeGlobalFnEvent('pjaxSendOnce')
+    btf.removeGlobalFnEvent('themeChange')
+
+    // reset readmode
+    const $bodyClassList = document.body.classList
+    if ($bodyClassList.contains('read-mode')) $bodyClassList.remove('read-mode')
+
+    triggerPjaxFn(window.globalFn.pjaxSend)
+  })
+
+  document.addEventListener('pjax:complete', () => {
+    btf.removeGlobalFnEvent('pjaxCompleteOnce')
+    document.querySelectorAll('script[data-pjax]').forEach(item => {
+      const newScript = document.createElement('script')
+      const content = item.text || item.textContent || item.innerHTML || ""
+      Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+      newScript.appendChild(document.createTextNode(content))
+      item.parentNode.replaceChild(newScript, item)
+    })
+
+    triggerPjaxFn(window.globalFn.pjaxComplete)
+  })
+
+  document.addEventListener('pjax:error', e => {
+    if (e.request.status === 404) {
+      const usePjax = true
+      true 
+        ? (usePjax ? pjax.loadUrl('/404.html') : window.location.href = '/404.html')
+        : window.location.href = e.request.responseURL
+    }
+  })
+})()</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div></body></html>
