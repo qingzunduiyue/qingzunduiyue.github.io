@@ -421,12 +421,7 @@ OK. 至此. 何为闭包? 上面这个就是闭包. 相信你百度一下就会�
 内层函数对外层函数变量的使用. 
 会让变量常驻与内存.
 
-]]></content>
-  </entry>
-  <entry>
-    <title>js逆向学习（三）</title>
-    <url>/2025/04/25/js%E5%AD%A6%E4%B9%A0%EF%BC%88%E4%B8%89%EF%BC%89/</url>
-    <content><![CDATA[变量提升(不正常现象)看以下代码, 或多或少会有些问题的.
+变量提升(不正常现象)看以下代码, 或多或少会有些问题的.
 function fn()&#123;    console.log(name);    var name = &#x27;cyt&#x27;;&#125;fn()
 
 发现问题了么. 这么写代码, 在其他语言里. 绝对是不允许的. 但是在js里. 不但允许, 还能执行. 为什么呢?  因为在js执行的时候. 它会首先检测你的代码.  发现在代码中会有name使用. OK. 运行时就会变成这样的逻辑:
@@ -435,7 +430,7 @@ function fn()&#123;    var name;    console.log(name);    name = &#x27;cyt&#x27;
 看到了么. 实际运行的时候和我们写代码的顺序可能会不一样….这种把变量提前到代码块第一部分运行的逻辑被称为变量提升. 这在其他语言里是绝对没有的. 并且也不是什么好事情. 正常的逻辑不应该是这样的. 那么怎么办?  在新的ES6中. 就明确了, 这样使用变量是不完善的. es6提出. 用let来声明变量. 就不会出现该问题了. 
 function fn()&#123;    console.log(name);  // 直接报错, let变量不可以变量提升.    let name = &#x27;大马猴&#x27;; &#125;fn()
 
-&#x3D;&#x3D;结论一, 用let声明变量是新版本javascript提倡的一种声明变量的方案. &#x3D;&#x3D; 
+**结论一, 用let声明变量是新版本javascript提倡的一种声明变量的方案. ** 
 let还有哪些作用呢?  
 function fn()&#123;    // console.log(name);  // 直接报错, let变量不可以变量提升.    // let name = &#x27;大马猴&#x27;;    var name = &quot;周杰伦&quot;;    var name = &quot;王力宏&quot;;    console.log(name);&#125;fn()
 
@@ -443,12 +438,19 @@ function fn()&#123;    // console.log(name);  // 直接报错, let变量不可�
 function fn()&#123;    // console.log(name);  // 直接报错, let变量不可以变量提升.    // let name = &#x27;大马猴&#x27;;    let name = &quot;周杰伦&quot;;    console.log(name);    let name = &quot;王力宏&quot;;    console.log(name);&#125;fn()
 
 注意, 报错是发生在代码检查阶段. 所以. 上述代码根本就执行不了. 
-&#x3D;&#x3D;结论二, 在同一个作用域内. let声明的变量只能声明一次. 其他使用上和var没有差别&#x3D;&#x3D;
+结论二, 在同一个作用域内. let声明的变量只能声明一次. 其他使用上和var没有差别
 js包的导入（exports）类似Python中的模块导入
 // functions.js文件// 加法函数function add(a, b) &#123;  return a + b;&#125;// 乘法函数function multiply(a, b) &#123;  return a * b;&#125;// 导出函数exports.add = add;exports.multiply = multiply;
 
 // main.js// 导入 functions 模块const functions = require(&#x27;./functions&#x27;);// 使用导入的函数console.log(functions.add(2, 3));  // 输出: 5console.log(functions.multiply(4, 5));  // 输出: 20
 ]]></content>
+  </entry>
+  <entry>
+    <title>js逆向学习（三）</title>
+    <url>/2025/04/25/js%E5%AD%A6%E4%B9%A0%EF%BC%88%E4%B8%89%EF%BC%89/</url>
+    <content><![CDATA[加密算法ps：本文默认阅读者配置了node.js运行环境
+
+base64编码]]></content>
   </entry>
   <entry>
     <title></title>
