@@ -1,0 +1,315 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>js逆向学习（三） | 青樽对月の小屋</title><meta name="author" content="青樽对月"><meta name="copyright" content="青樽对月"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="ffffff"><meta name="description" content="变量提升(不正常现象)看以下代码, 或多或少会有些问题的. 12345function fn()&#123;    console.log(name);    var name &#x3D; &#x27;cyt&#x27;;&#125;fn()  发现问题了么. 这么写代码, 在其他语言里. 绝对是不允许的. 但是在js里. 不但允许, 还能执行. 为什么呢?  因为在js执行的时候. 它会首先检测你的代码">
+<meta property="og:type" content="article">
+<meta property="og:title" content="js逆向学习（三）">
+<meta property="og:url" content="https://cyter.top/2025/04/25/js%E5%AD%A6%E4%B9%A0%EF%BC%88%E4%B8%89%EF%BC%89/index.html">
+<meta property="og:site_name" content="青樽对月の小屋">
+<meta property="og:description" content="变量提升(不正常现象)看以下代码, 或多或少会有些问题的. 12345function fn()&#123;    console.log(name);    var name &#x3D; &#x27;cyt&#x27;;&#125;fn()  发现问题了么. 这么写代码, 在其他语言里. 绝对是不允许的. 但是在js里. 不但允许, 还能执行. 为什么呢?  因为在js执行的时候. 它会首先检测你的代码">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://image-1352611653.cos.ap-guangzhou.myqcloud.com/img/wallhaven-mdjwjy_3840x2160.png">
+<meta property="article:published_time" content="2025-04-25T09:19:00.000Z">
+<meta property="article:modified_time" content="2025-04-25T09:24:01.669Z">
+<meta property="article:author" content="青樽对月">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://image-1352611653.cos.ap-guangzhou.myqcloud.com/img/wallhaven-mdjwjy_3840x2160.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "js逆向学习（三）",
+  "url": "https://cyter.top/2025/04/25/js%E5%AD%A6%E4%B9%A0%EF%BC%88%E4%B8%89%EF%BC%89/",
+  "image": "https://image-1352611653.cos.ap-guangzhou.myqcloud.com/img/wallhaven-mdjwjy_3840x2160.png",
+  "datePublished": "2025-04-25T09:19:00.000Z",
+  "dateModified": "2025-04-25T09:24:01.669Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "青樽对月",
+      "url": "https://cyter.top/"
+    }
+  ]
+}</script><link rel="shortcut icon" href="https://image-1352611653.cos.ap-guangzhou.myqcloud.com/20200917125650_thSrZ.jpeg"><link rel="canonical" href="https://cyter.top/2025/04/25/js%E5%AD%A6%E4%B9%A0%EF%BC%88%E4%B8%89%EF%BC%89/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!true && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":true,"top_n_per_article":1,"unescape":true,"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: true,
+    post: true
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: {"limitCount":50,"languages":{"author":"作者: 青樽对月","link":"链接: ","source":"来源: 青樽对月の小屋","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。"}},
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"已切换为繁体中文","cht_to_chs":"已切换为简体中文","day_to_night":"已切换为深色模式","night_to_day":"已切换为浅色模式","bgLight":"#49b1f5","bgDark":"#1f1f1f","position":"top-right"},
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: true,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'js逆向学习（三）',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><link rel="stylesheet" href="/css/custom.css" media="defer" onload="this.media='all'"><link rel="stylesheet" href="/css/transpancy.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg" style="background-image: url(https://image-1352611653.cos.ap-guangzhou.myqcloud.com/wallhaven-z8l37o.jpg);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://image-1352611653.cos.ap-guangzhou.myqcloud.com/20200917125650_thSrZ.jpeg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">8</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><span class="site-page group hide"><i class="fa-fw fas fa-book"></i><span> 小说（自创）</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/%E5%9B%9E%E5%BF%86/"><i class="fa-fw fas fa-book"></i><span> 隐藏在时光里的回忆</span></a></li><li><a class="site-page child" href="/%E9%86%89%E6%AC%A2%E8%A1%8C/"><i class="fa-fw fas fa-book"></i><span> 醉欢行</span></a></li></ul></div><div class="menus_item"><span class="site-page group hide"><i class="fa-fw fas fa-list"></i><span> 列表</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li><li><a class="site-page child" href="/poem/"><i class="fa-fw fas fa-pen-fancy"></i><span> 诗词</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/comments/"><i class="fa-fw fas fa-envelope-open"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友情链接</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于我</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(https://image-1352611653.cos.ap-guangzhou.myqcloud.com/img/wallhaven-mdjwjy_3840x2160.png);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">青樽对月の小屋</span></a><a class="nav-page-title" href="/"><span class="site-name">js逆向学习（三）</span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><span class="site-page group hide"><i class="fa-fw fas fa-book"></i><span> 小说（自创）</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/%E5%9B%9E%E5%BF%86/"><i class="fa-fw fas fa-book"></i><span> 隐藏在时光里的回忆</span></a></li><li><a class="site-page child" href="/%E9%86%89%E6%AC%A2%E8%A1%8C/"><i class="fa-fw fas fa-book"></i><span> 醉欢行</span></a></li></ul></div><div class="menus_item"><span class="site-page group hide"><i class="fa-fw fas fa-list"></i><span> 列表</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li><li><a class="site-page child" href="/poem/"><i class="fa-fw fas fa-pen-fancy"></i><span> 诗词</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/comments/"><i class="fa-fw fas fa-envelope-open"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友情链接</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于我</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">js逆向学习（三）</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-04-25T09:19:00.000Z" title="发表于 2025-04-25 17:19:00">2025-04-25</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-04-25T09:24:01.669Z" title="更新于 2025-04-25 17:24:01">2025-04-25</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">总字数:</span><span class="word-count">653</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>2分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h1 id="变量提升-不正常现象"><a href="#变量提升-不正常现象" class="headerlink" title="变量提升(不正常现象)"></a>变量提升(不正常现象)</h1><p>看以下代码, 或多或少会有些问题的.</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">fn</span>(<span class="params"></span>)&#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(name);</span><br><span class="line">    <span class="keyword">var</span> name = <span class="string">&#x27;cyt&#x27;</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="title function_">fn</span>()</span><br></pre></td></tr></table></figure>
+
+<p>发现问题了么. 这么写代码, 在其他语言里. 绝对是不允许的. 但是在js里. 不但允许, 还能执行. 为什么呢?  因为在js执行的时候. 它会首先检测你的代码.  发现在代码中会有name使用. OK. 运行时就会变成这样的逻辑:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">fn</span>(<span class="params"></span>)&#123;</span><br><span class="line">    <span class="keyword">var</span> name;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(name);</span><br><span class="line">    name = <span class="string">&#x27;cyt&#x27;</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="title function_">fn</span>()</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(a);</span><br></pre></td></tr></table></figure>
+
+<p>看到了么. 实际运行的时候和我们写代码的顺序可能会不一样….这种把变量提前到代码块第一部分运行的逻辑被称为<strong>变量提升</strong>. 这在其他语言里是绝对没有的. 并且也不是什么好事情. 正常的逻辑不应该是这样的. 那么怎么办?  在新的ES6中. 就明确了, 这样使用变量是不完善的. es6提出. 用let来声明变量. 就不会出现该问题了. </p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">fn</span>(<span class="params"></span>)&#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(name);  <span class="comment">// 直接报错, let变量不可以变量提升.</span></span><br><span class="line">    <span class="keyword">let</span> name = <span class="string">&#x27;大马猴&#x27;</span>; </span><br><span class="line">&#125;</span><br><span class="line"><span class="title function_">fn</span>()</span><br></pre></td></tr></table></figure>
+
+<p>&#x3D;&#x3D;结论一, 用let声明变量是新版本javascript提倡的一种声明变量的方案. &#x3D;&#x3D; </p>
+<p>let还有哪些作用呢?  </p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">fn</span>(<span class="params"></span>)&#123;</span><br><span class="line">    <span class="comment">// console.log(name);  // 直接报错, let变量不可以变量提升.</span></span><br><span class="line">    <span class="comment">// let name = &#x27;大马猴&#x27;;</span></span><br><span class="line">    <span class="keyword">var</span> name = <span class="string">&quot;周杰伦&quot;</span>;</span><br><span class="line">    <span class="keyword">var</span> name = <span class="string">&quot;王力宏&quot;</span>;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(name);</span><br><span class="line">&#125;</span><br><span class="line"><span class="title function_">fn</span>()</span><br></pre></td></tr></table></figure>
+
+<p>显然一个变量被声明了两次. 这样也是不合理的. var本意是声明变量. 同一个东西. 被声明两次. 所以ES6规定. let声明的变量. 在同一个作用域内. 只能声明一次. </p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">fn</span>(<span class="params"></span>)&#123;</span><br><span class="line">    <span class="comment">// console.log(name);  // 直接报错, let变量不可以变量提升.</span></span><br><span class="line">    <span class="comment">// let name = &#x27;大马猴&#x27;;</span></span><br><span class="line">    <span class="keyword">let</span> name = <span class="string">&quot;周杰伦&quot;</span>;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(name);</span><br><span class="line">    <span class="keyword">let</span> name = <span class="string">&quot;王力宏&quot;</span>;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(name);</span><br><span class="line">&#125;</span><br><span class="line"><span class="title function_">fn</span>()</span><br></pre></td></tr></table></figure>
+
+<p>注意, 报错是发生在代码检查阶段. 所以. 上述代码根本就执行不了. </p>
+<p>&#x3D;&#x3D;结论二, 在同一个作用域内. let声明的变量只能声明一次. 其他使用上和var没有差别&#x3D;&#x3D;</p>
+<h1 id="js包的导入（exports）"><a href="#js包的导入（exports）" class="headerlink" title="js包的导入（exports）"></a>js包的导入（exports）</h1><p>类似Python中的模块导入</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// functions.js文件</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 加法函数</span></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">add</span>(<span class="params">a, b</span>) &#123;</span><br><span class="line">  <span class="keyword">return</span> a + b;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 乘法函数</span></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">multiply</span>(<span class="params">a, b</span>) &#123;</span><br><span class="line">  <span class="keyword">return</span> a * b;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 导出函数</span></span><br><span class="line"><span class="built_in">exports</span>.<span class="property">add</span> = add;</span><br><span class="line"><span class="built_in">exports</span>.<span class="property">multiply</span> = multiply;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// main.js</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 导入 functions 模块</span></span><br><span class="line"><span class="keyword">const</span> functions = <span class="built_in">require</span>(<span class="string">&#x27;./functions&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用导入的函数</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(functions.<span class="title function_">add</span>(<span class="number">2</span>, <span class="number">3</span>));  <span class="comment">// 输出: 5</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(functions.<span class="title function_">multiply</span>(<span class="number">4</span>, <span class="number">5</span>));  <span class="comment">// 输出: 20</span></span><br></pre></td></tr></table></figure>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://cyter.top">青樽对月</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://cyter.top/2025/04/25/js%E5%AD%A6%E4%B9%A0%EF%BC%88%E4%B8%89%EF%BC%89/">https://cyter.top/2025/04/25/js%E5%AD%A6%E4%B9%A0%EF%BC%88%E4%B8%89%EF%BC%89/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="https://cyter.top" target="_blank">青樽对月の小屋</a>！</span></div></div><div class="tag_share"><div class="post-share"><div class="social-share" data-image="https://image-1352611653.cos.ap-guangzhou.myqcloud.com/img/wallhaven-mdjwjy_3840x2160.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related full-width" href="/2025/04/25/js%E5%AD%A6%E4%B9%A0%EF%BC%88%E4%BA%8C%EF%BC%89/" title="js逆向学习（二）"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://image-1352611653.cos.ap-guangzhou.myqcloud.com/img/wallhaven-j5mz95_1920x1080.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">js逆向学习（二）</div></div><div class="info-2"><div class="info-item-1">tip 由于js逆向中需要对js有一定的了解，所以在正式尝试案例前需要对js的一些基础有一定了解，所以会用一定的篇幅去解释一些基础概念语句。 object对象object对象的基本操作 Object 的实例不具备多少功能，但对于在应用程序中存储和传输数据而言，它们确实是非常理想的选择。&#96;创建 Object 实例的方式有两种。 123456789101112//var person = new Object()  person.name = &quot;cyt&quot;  person.age = 19  console.log(person)   //第二种方式是使用对象字面量表示法。对象字面量是对象定义的一种简写形式，目的在于简化创建包含大量属性的对象的过程。 var people = &#123;      name : &quot;zyj&quot;,      age : 19  &#125;  console.log(people)  object可以通过. 和 []来访问。  12console.log(people.name) ...</div></div></div></a></nav><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div id="twikoo-wrap"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://image-1352611653.cos.ap-guangzhou.myqcloud.com/20200917125650_thSrZ.jpeg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">青樽对月</div><div class="author-info-description">博客</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">8</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/qingzunduiyue/qingzunduiyue.github.io"><i class="fab fa-github"></i><span>关注</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/qingzunduiyue" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:178148931@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">恭喜你发现了一个宝藏
+有疑问可在评论区或者加微信询问
+<div style="text-align: center; margin-top: 10px;">
+  <img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://image-1352611653.cos.ap-guangzhou.myqcloud.com/img/b24c8c4afbed83349fb20acc5a2722e.jpg" 
+      alt="二维码" 
+      style="width: 200px; height: auto; border: 1px solid #eee;">
+</div>
+</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8F%98%E9%87%8F%E6%8F%90%E5%8D%87-%E4%B8%8D%E6%AD%A3%E5%B8%B8%E7%8E%B0%E8%B1%A1"><span class="toc-number">1.</span> <span class="toc-text">变量提升(不正常现象)</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#js%E5%8C%85%E7%9A%84%E5%AF%BC%E5%85%A5%EF%BC%88exports%EF%BC%89"><span class="toc-number">2.</span> <span class="toc-text">js包的导入（exports）</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2025/04/25/js%E5%AD%A6%E4%B9%A0%EF%BC%88%E4%B8%89%EF%BC%89/" title="js逆向学习（三）"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://image-1352611653.cos.ap-guangzhou.myqcloud.com/img/wallhaven-mdjwjy_3840x2160.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="js逆向学习（三）"/></a><div class="content"><a class="title" href="/2025/04/25/js%E5%AD%A6%E4%B9%A0%EF%BC%88%E4%B8%89%EF%BC%89/" title="js逆向学习（三）">js逆向学习（三）</a><time datetime="2025-04-25T09:19:00.000Z" title="发表于 2025-04-25 17:19:00">2025-04-25</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/04/25/js%E5%AD%A6%E4%B9%A0%EF%BC%88%E4%BA%8C%EF%BC%89/" title="js逆向学习（二）"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://image-1352611653.cos.ap-guangzhou.myqcloud.com/img/wallhaven-j5mz95_1920x1080.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="js逆向学习（二）"/></a><div class="content"><a class="title" href="/2025/04/25/js%E5%AD%A6%E4%B9%A0%EF%BC%88%E4%BA%8C%EF%BC%89/" title="js逆向学习（二）">js逆向学习（二）</a><time datetime="2025-04-25T06:00:00.000Z" title="发表于 2025-04-25 14:00:00">2025-04-25</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/04/24/js%E5%AD%A6%E4%B9%A0%EF%BC%88%E4%B8%80%EF%BC%89/" title="js逆向学习（一）"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://image-1352611653.cos.ap-guangzhou.myqcloud.com/img/wallhaven-g73l2l.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="js逆向学习（一）"/></a><div class="content"><a class="title" href="/2025/04/24/js%E5%AD%A6%E4%B9%A0%EF%BC%88%E4%B8%80%EF%BC%89/" title="js逆向学习（一）">js逆向学习（一）</a><time datetime="2025-04-24T02:48:00.000Z" title="发表于 2025-04-24 10:48:00">2025-04-24</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/04/21/%E7%88%AC%E8%99%AB%EF%BC%88%E5%9B%9B%EF%BC%89/" title="python爬虫学习（四）"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://image-1352611653.cos.ap-guangzhou.myqcloud.com/img/wallhaven-x8qoz3.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="python爬虫学习（四）"/></a><div class="content"><a class="title" href="/2025/04/21/%E7%88%AC%E8%99%AB%EF%BC%88%E5%9B%9B%EF%BC%89/" title="python爬虫学习（四）">python爬虫学习（四）</a><time datetime="2025-04-21T11:00:00.000Z" title="发表于 2025-04-21 19:00:00">2025-04-21</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/04/20/%E5%88%A9%E7%94%A8DrissionPge%E7%88%AC%E5%8F%96%E6%B7%98%E5%AE%9D%E6%95%B0%E6%8D%AE/" title="利用DrissionPge爬取淘宝数据"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://image-1352611653.cos.ap-guangzhou.myqcloud.com/img/wallhaven-6kv1ow_1920x1080.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="利用DrissionPge爬取淘宝数据"/></a><div class="content"><a class="title" href="/2025/04/20/%E5%88%A9%E7%94%A8DrissionPge%E7%88%AC%E5%8F%96%E6%B7%98%E5%AE%9D%E6%95%B0%E6%8D%AE/" title="利用DrissionPge爬取淘宝数据">利用DrissionPge爬取淘宝数据</a><time datetime="2025-04-20T07:48:00.000Z" title="发表于 2025-04-20 15:48:00">2025-04-20</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url(https://image-1352611653.cos.ap-guangzhou.myqcloud.com/wallhaven-9mjoy1.png);"><div id="footer-wrap"><div class="copyright">&copy;2025 By 青樽对月</div><div class="footer_custom_text">欢迎来到我的博客 <br> 备案号:浙ICP备2025164162号-1</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="前往评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/instant.page/instantpage.min.js" type="module"></script><script src="https://cdn.jsdelivr.net/npm/vanilla-lazyload/dist/lazyload.iife.min.js"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script><div class="js-pjax"><script>(() => {
+  const isShuoshuo = GLOBAL_CONFIG_SITE.pageType === 'shuoshuo'
+  const option = null
+
+  const getCount = () => {
+    const countELement = document.getElementById('twikoo-count')
+    if(!countELement) return
+    twikoo.getCommentsCount({
+      envId: 'https://data.cyter.top',
+      region: '',
+      urls: [window.location.pathname],
+      includeReply: false
+    }).then(res => {
+      countELement.textContent = res[0].count
+    }).catch(err => {
+      console.error(err)
+    })
+  }
+
+  const init = (el = document, path = location.pathname) => {
+    twikoo.init({
+      el: el.querySelector('#twikoo-wrap'),
+      envId: 'https://data.cyter.top',
+      region: '',
+      onCommentLoaded: () => {
+        btf.loadLightbox(document.querySelectorAll('#twikoo .tk-content img:not(.tk-owo-emotion)'))
+      },
+      ...option,
+      path: isShuoshuo ? path : (option && option.path) || path
+    })
+
+    
+
+    isShuoshuo && (window.shuoshuoComment.destroyTwikoo = () => {
+      if (el.children.length) {
+        el.innerHTML = ''
+        el.classList.add('no-comment')
+      }
+    })
+  }
+
+  const loadTwikoo = (el, path) => {
+    if (typeof twikoo === 'object') setTimeout(() => init(el, path), 0)
+    else btf.getScript('https://cdn.jsdelivr.net/npm/twikoo/dist/twikoo.all.min.js').then(() => init(el, path))
+  }
+
+  if (isShuoshuo) {
+    'Twikoo' === 'Twikoo'
+      ? window.shuoshuoComment = { loadComment: loadTwikoo }
+      : window.loadOtherComment = loadTwikoo
+    return
+  }
+
+  if ('Twikoo' === 'Twikoo' || !true) {
+    if (true) btf.loadComment(document.getElementById('twikoo-wrap'), loadTwikoo)
+    else loadTwikoo()
+  } else {
+    window.loadOtherComment = loadTwikoo
+  }
+})()</script></div><script id="click-show-text" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/click-show-text.min.js" data-mobile="false" data-text="功德+1" data-fontsize="15px" data-random="false" async="async"></script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/metingjs/dist/Meting.min.js"></script><script>(() => {
+  const destroyAplayer = () => {
+    if (window.aplayers) {
+      for (let i = 0; i < window.aplayers.length; i++) {
+        if (!window.aplayers[i].options.fixed) {
+          window.aplayers[i].destroy()
+        }
+      }
+    }
+  }
+
+  const runMetingJS = () => {
+    typeof loadMeting === 'function' && document.getElementsByClassName('aplayer').length && loadMeting()
+  }
+
+  btf.addGlobalFn('pjaxSend', destroyAplayer, 'destroyAplayer')
+  btf.addGlobalFn('pjaxComplete', loadMeting, 'runMetingJS')
+})()</script><script src="https://cdn.jsdelivr.net/npm/pjax/pjax.min.js"></script><script>(() => {
+  const pjaxSelectors = ["head > title","#config-diff","#body-wrap","#rightside-config-hide","#rightside-config-show",".js-pjax"]
+
+  window.pjax = new Pjax({
+    elements: 'a:not([target="_blank"]):not([href="/music/"]):not([href="/no-pjax/"])',
+    selectors: pjaxSelectors,
+    cacheBust: false,
+    analytics: false,
+    scrollRestoration: false
+  })
+
+  const triggerPjaxFn = (val) => {
+    if (!val) return
+    Object.values(val).forEach(fn => fn())
+  }
+
+  document.addEventListener('pjax:send', () => {
+    // removeEventListener
+    btf.removeGlobalFnEvent('pjaxSendOnce')
+    btf.removeGlobalFnEvent('themeChange')
+
+    // reset readmode
+    const $bodyClassList = document.body.classList
+    if ($bodyClassList.contains('read-mode')) $bodyClassList.remove('read-mode')
+
+    triggerPjaxFn(window.globalFn.pjaxSend)
+  })
+
+  document.addEventListener('pjax:complete', () => {
+    btf.removeGlobalFnEvent('pjaxCompleteOnce')
+    document.querySelectorAll('script[data-pjax]').forEach(item => {
+      const newScript = document.createElement('script')
+      const content = item.text || item.textContent || item.innerHTML || ""
+      Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+      newScript.appendChild(document.createTextNode(content))
+      item.parentNode.replaceChild(newScript, item)
+    })
+
+    triggerPjaxFn(window.globalFn.pjaxComplete)
+  })
+
+  document.addEventListener('pjax:error', e => {
+    if (e.request.status === 404) {
+      const usePjax = true
+      true 
+        ? (usePjax ? pjax.loadUrl('/404.html') : window.location.href = '/404.html')
+        : window.location.href = e.request.responseURL
+    }
+  })
+})()</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div></body></html>

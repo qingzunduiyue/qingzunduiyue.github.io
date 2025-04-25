@@ -270,6 +270,184 @@ let 变量名; // 创建变量, 此时该变量除了被赋值啥也干不了. l
 字符串操作// split   正则分割,经常用于把字符串转换成数组var str = &quot;广东-深圳-南山&quot;;var ret = str.split(&quot;-&quot;);console.log( ret );// substr  截取var str = &quot;hello world&quot;;var ret = str.substr(0,3);console.log(ret); // hel// trim    移除字符串首尾空白var password = &quot;    ge llo   &quot;;var ret = password.trim();console.log(ret) // ge lloconsole.log(password.length); // 13console.log(ret.length);  // 6// 切片,当前方法支持使用负数代表倒数下标(从0开始)// slice(开始下标)   从开始位置切到最后// slice(开始下标,结束下标)  从开始下标切到指定位置之前var str = &quot;helloworld&quot;;var ret = str.slice(3,6); // 开区间,不包含结束下标的内容console.log(ret); // lowvar ret = str.slice(5);console.log(ret); // worldvar ret = str.slice(2,-1);console.log(ret); // lloworls.substring(start, end)  //字符串切割, 从start切割到ends.length  //字符串长度s.charAt(i) //第i索引位置的字符  s[i]s.indexOf(&#x27;xxx&#x27;)  //返回xxx的索引位置, 如果没有xxx. 则返回-1s.lastIndexOf(&quot;xxx&quot;) //返回xxx的最后一次出现的索引位置，如果没有xxx. 则返回-1s.toUpperCase() //转换成大写字母s.startsWith(&quot;xxx&quot;)  //判断是否以xxx开头s.charCodeAt(i) //某个位置的字符的asciiString.fromCharCode(ascii) //给出ascii 还原成正常字符
 字符串正则// match  正则匹配// js中也存在正则,正则的使用符号和python里面是一样的//语法：/正则表达式主体/修饰符(可选)//修饰符：	//i:执行对大小写不敏感的匹配。	//g:执行全局匹配（查找所有匹配而非在找到第一个匹配后停止）。var str = &quot;我的电话是: 13312345678,你的电话: 13512345678&quot;;var ret = str.match(/\d&#123;11&#125;/g); // 匹配,提取数据console.log(ret);// replace  正则替换var str = &quot;我的电话是: 13512345678&quot;;var ret = str.replace(/(\d&#123;3&#125;)\d&#123;4&#125;(\d&#123;4&#125;)/,&quot;$1****$2&quot;); // 正则的捕获模式  $1$2表示的正则中第一个和第二个小括号捕获的内容console.log(ret);// search  正则查找,如果查找不到,则返回-1var str = &quot;hello&quot;;var ret = str.search(/l/);console.log(ret);
 运算符（逻辑和三目运算符）//逻辑运算符  &amp;&amp;   //并且  and    两边的运算结果为true,最终结果才是true  ||  // 或者  or     两边的运算结果为false,最终结果才是false  !    //非    not    运算符的结果如果是true,则最终结果是false ,反之亦然. //条件运算符[三目运算符]	 //条件?true:false	 //例如:	      var age = 12;        var ret = age&gt;=18?&quot;成年&quot;:&quot;未成年&quot;;         console.log(ret);
+
+流程控制语句
+顺序结构(从上向下顺序执行)
+分支结构
+循环结构
+
+之前我们学习的方式就是顺序执行，即代码的执行从上到下，一行行分别执行。
+例如：
+console.log(&quot;星期一&quot;);console.log(&quot;星期二&quot;);console.log(&quot;星期三&quot;);
+
+分支结构
+if 分支语句if(条件)&#123;     // 条件为true时,执行的代码   &#125;      if(条件)&#123;     // 条件为true时,执行的代码   &#125;else&#123;     // 条件为false时,执行的代码   &#125;      if(条件1)&#123;     // 条件1为true时,执行的代码   &#125;else if(条件2)&#123;     // 条件2为true时,执行的代码      &#125;....      &#125;else&#123;     // 上述条件都不成立的时候,执行的代码   &#125;
+switch语句switch(条件)&#123;      case 结果1:           满足条件执行的结果是结果1时,执行这里的代码..           break;      case 结果2:      	   满足条件执行的结果是结果2时,执行这里的代码..      	   break;      .....      default:           条件和上述所有结果都不相等时,则执行这里的代码   &#125;switch(&#x27;a&#x27;):  case 1: //只会会执行case 1下面的xxx代码  	xxx  	break;  case 2:  	xxx  	break;  default:  	xxx  	break
+
+
+1、switch比if else更为简洁
+2、执行效率更高。switch…case会生成一个跳转表来指示实际的case分支的地址，而这个跳转表的索引号与switch变量的值是相等的。从而，switch…case不用像if…else那样遍历条件分支直到命中条件，而只需访问对应索引号的表项从而到达定位分支的目的。
+3、到底使用哪一个选择语句，代码环境有关，如果是范围取值，则使用if else语句更为快捷；如果是确定取值，则使用switch是更优方案。
+
+循环语句
+while循环
+
+while(循环的条件)&#123;   // 循环条件为true的时候,会执行这里的代码&#125;  
+
+循环案例：
+var count = 0while (count&lt;10)&#123;    console.log(count);    count++;&#125;
+
+
+for循环
+
+// 循环三要素for(1.声明循环的开始; 2.条件; 4. 循环的计数)&#123;   // 3. 循环条件为true的时候,会执行这里的代码&#125;for(循环的成员下标 in 被循环的数据)&#123;   // 当被循环的数据一直没有执行到最后下标,都会不断执行这里的代码&#125;   
+
+循环案例：
+// 方式1for (var i = 0;i&lt;10;i++)&#123;	console.log(i)&#125;// 方式2var arr = [111,222,333]for (var i in arr)&#123;    console.log(i,arr[i])&#125;
+
+
+退出循环（break和continue）
+
+for (var i = 0;i&lt;100;i++)&#123;          if (i===88)&#123;              continue  // 退出当次循环              // break  // 退出当前整个循环          &#125;          console.log(i)      &#125;
+
+数组对象
+数组方法
+
+var arr = [&quot;A&quot;,&quot;B&quot;,&quot;C&quot;,&quot;D&quot;];// 内置属性console.log( arr.length );// 获取指定下标的成员console.log( arr[3] ); // Dconsole.log( arr[arr.length-1] ); // 最后一个成员// (1) pop()  出栈,删除最后一个成员作为返回值var arr = [1,2,3,4,5];var ret = arr.pop();console.log(arr); // [1, 2, 3, 4]console.log(ret); // 5// (2) push() 入栈,给数组后面追加成员var arr = [1,2,3,4,5];arr.push(&quot;a&quot;);console.log(arr); // [1, 2, 3, 4, 5, &quot;a&quot;]// (3) shift是将数组的第一个元素删除var arr = [1,2,3,4,5];arr.shift()console.log(arr); // [2, 3, 4, 5]// (4) unshift是将value值插入到数组的开始var arr = [1,2,3,4,5];arr.unshift(&quot;bobo&quot;)console.log(arr); // [&quot;bobo&quot;,1,2, 3, 4, 5]// (5) reverse() 反转排列var arr = [1,2,3,4,5];arr.reverse();console.log(arr); // [5, 4, 3, 2, 1]// (6) slice(开始下标,结束下标)  切片,开区间var arr = [1,2,3,4,5];console.log(arr.slice(1,3));// (7) concat() 把2个或者多个数组合并var arr1 = [1,2,3];var arr2 = [4,5,7];var ret = arr1.concat(arr2);console.log( ret );// (8) join()  把数组的每一个成员按照指定的符号进行拼接成字符串var str = &quot;广东-深圳-南山&quot;;var arr = str.split(&quot;-&quot;);console.log( arr ); // [&quot;广东&quot;, &quot;深圳&quot;, &quot;南山&quot;];var arr1 = [&quot;广东&quot;, &quot;深圳&quot;, &quot;南山&quot;];var str1 = arr1.join(&quot;-&quot;);console.log( str1 ); // 广东-深圳-南山       
+
+
+遍历数组
+
+var arr = [12,23,34]for (var i in arr)&#123;      console.log(i,arr[i])&#125;
+]]></content>
+  </entry>
+  <entry>
+    <title>js逆向学习（二）</title>
+    <url>/2025/04/25/js%E5%AD%A6%E4%B9%A0%EF%BC%88%E4%BA%8C%EF%BC%89/</url>
+    <content><![CDATA[tip 由于js逆向中需要对js有一定的了解，所以在正式尝试案例前需要对js的一些基础有一定了解，所以会用一定的篇幅去解释一些基础概念语句。
+object对象object对象的基本操作 Object 的实例不具备多少功能，但对于在应用程序中存储和传输数据而言，它们确实是非常理想的选择。&#96;创建 Object 实例的方式有两种。
+//var person = new Object()  person.name = &quot;cyt&quot;  person.age = 19  console.log(person)   //第二种方式是使用对象字面量表示法。对象字面量是对象定义的一种简写形式，目的在于简化创建包含大量属性的对象的过程。 var people = &#123;      name : &quot;zyj&quot;,      age : 19  &#125;  console.log(people)
+
+object可以通过. 和 []来访问。
+
+console.log(people.name)  console.log(person[&#x27;age&#x27;])
+
+object可以通过for循环遍历
+
+for (var attr in person)&#123;          console.log(attr,person[attr]);     &#125;
+通过构造函数和 new 关键字实现面向对象编程，展示对象的实例化、属性赋值和方法调用。尽管在 ES6+ 中更推荐使用 class，但理解构造函数模式仍是掌握 JS 面向对象的基础。
+function person(name,age) &#123;      this.name = name      this.age = age      this.eat = function()&#123;          console.log(this.name+&quot;正在吃饭&quot;)      &#125;  &#125;  var p1 = new person(&quot;jyh&quot;,20)  p1.eat()
+
+json序列化和反序列化JSON：JavaScript 对象表示法，是一种轻量级的数据交换格式。易于人阅读和编写。
+
+json是一种数据格式, 语法一般是{}或者[]包含起来
+内部成员以英文逗号隔开,最后一个成员不能使用逗号!
+可以是键值对,也可以是列表成员
+json中的成员如果是键值对,则键名必须是字符串.而json中的字符串必须使用双引号圈起来&#x2F;&#x2F; json数据也可以保存到文件中,一般以”.json”结尾.var data = &#123;    name: &quot;xiaoming&quot;,    age: 22,    say: function()&#123;        alert(123);    &#125;&#125;;// 把对象转换成json字符串var ret = JSON.stringify(data);console.log(ret ); // &#123;&quot;name&quot;:&quot;xiaoming&quot;,&quot;age&quot;:22&#125;// 把json字符串转换成json对象var ret2 = JSON.parse(ret);console.log(ret2);
+
+Date对象
+创建Date对象
+
+//方法1：不指定参数var nowd1=new Date(); //获取当前时间console.log(nowd1);console.log(nowd1.toLocaleString( ));//方法2：参数为日期字符串var d2=new Date(&quot;2004/3/20 11:12&quot;);console.log(d2.toLocaleString( ));var d3=new Date(&quot;04/03/20 11:12&quot;);console.log(d3.toLocaleString( ));
+
+
+获取时间信息
+
+获取日期和时间var date=new Date();date.getDate()();    getDate()                 获取日    getDay ()                 获取星期    getMonth ()               获取月（0-11）    getFullYear ()            获取完整年份    getHours ()               获取小时    getMinutes ()             获取分钟    getSeconds ()             获取秒    getMilliseconds ()        获取毫秒
+
+Math对象// Math对象的内置方法// abs(x)  返回数值的绝对值var num = -10;console.log( Math.abs(num) ); // 10// ceil(x)  向上取整var num = 10.3;console.log( Math.ceil(num) ); // 11// floor(x) 向下取整var num = 10.3;console.log( Math.floor(num) ); // 10// max(x,y,z,...,n)console.log( Math.max(3,56,3) ); // 56// min(x,y,z,...,n)// random()  生成0-1随机数console.log( Math.random() );// 生成0-10之间的数值console.log( Math.random() * 10 );// round(x) 四舍五入// 生成0-10之间的整数console.log( Math.round( Math.random() * 10 ) );
+JS中的函数（重点）声明函数// 函数的定义方式1function 函数名 (参数)&#123;    函数体;    return 返回值;&#125; /*功能说明：    可以使用变量、常量或表达式作为函数调用的参数    函数由关键字function定义    函数名的定义规则与标识符一致，大小写是敏感的    返回值必须使用return    */ //  函数的定义方式2    //用 Function 类直接创建函数的语法如下：var 函数名 = new Function(&quot;参数1&quot;,&quot;参数n&quot;,&quot;function_body&quot;);//虽然由于字符串的关系，第二种形式写起来有些困难，但有助于理解函数只不过是一种引用类型
+
+函数调用//f(); ---&gt;OKfunction f()&#123;    console.log(&quot;hello&quot;)&#125;f() //-----&gt;OK
+
+
+不同于python，js代码在运行时，会分为两大部分———检查装载 和 执行阶段。
+
+检查装载阶段：会先检测代码的语法错误，进行变量、函数的声明
+执行阶段：变量的赋值、函数的调用等，都属于执行阶段。
+
+
+函数参数（1） 参数基本使用
+// 位置参数function add(a,b)&#123;    console.log(a);    console.log(b);&#125;add(1,2)// 会自动忽略第三个add(1,2,3)//会只输出1add(1)// 默认参数// 默认参数  function stu_info(name,gender)&#123;      console.log(&quot;姓名：&quot;+name+&quot; 性别：&quot;+gender)  &#125;    stu_info(&quot;bobo&quot;,&quot;男&quot;)
+函数返回值在函数体内，使用 return 语句可以设置函数的返回值。一旦执行 return 语句，将停止函数的运行，并运算和返回 return 后面的表达式的值。如果函数不包含 return 语句，则执行完函数体内每条语句后，返回 undefined 值。
+function add(x,y) &#123;          return x,y      &#125;var ret = add(2,5);console.log(ret)
+
+
+1、在函数体内可以包含多条 return 语句，但是仅能执行一条 return 语句
+2、函数的参数没有限制，但是返回值只能是一个；如果要输出多个值，可以通过数组或对象进行设计。
+
+作用域作用域是JavaScript最重要的概念之一。
+JavaScript中，变量的作用域有全局作用域和局部作用域两种。
+
+局部变量,是在函数内部声明,它的生命周期在当前函数被调用的时候, 当函数调用完毕以后,则内存中自动销毁当前变量
+全局变量,是在函数外部声明,它的生命周期在当前文件中被声明以后就保存在内存中,直到当前文件执行完毕以后,才会被内存销毁掉
+
+首先熟悉下var
+var name = &quot;bobo&quot;; // 声明一个全局变量 name并赋值”bobo“name = &quot;张三&quot;;  // 对已经存在的变量name重新赋值 ”张三“console.log(name);var  gender = &quot;male&quot;var  gender = &quot;female&quot; // 原内存释放与新内存开辟，指针指向新开辟的内存console.log(gender)
+
+  作用域案例：
+ var num = 10; // 在函数外部声明的变量, 全局变量function func()&#123;  //千万不要再函数内部存在和全局变量同名的变量  num = 20; // 函数内部直接使用变量,则默认调用了全局的变量,&#125;func();console.log(&quot;全局num：&quot;,num);
+匿名函数匿名函数，即没有变量名的函数。在实际开发中使用的频率非常高！也是学好JS的重点。
+   // 匿名函数赋值变量    var foo = function () &#123;        console.log(&quot;这是一个匿名函数！&quot;)    &#125;;foo() //调用匿名函数   // 匿名函数的自执行   (function (x,y) &#123;        console.log(x+y);    &#125;)(2,3)  // 匿名函数作为一个高阶函数使用  function bar() &#123;     return function () &#123;         console.log(&quot;inner函数！&quot;)     &#125; &#125; bar()()     
+
+闭包函数我们先看一段代码. 
+let name = &quot;周杰伦&quot;;function chi()&#123;    name = &quot;吃掉&quot;;&#125;chi();console.log(name);
+
+发现没有, 在函数内部想要修改外部的变量是十分容易的一件事. 尤其是全局变量. 这是非常危险的.  试想, 我写了一个函数. 要用到name, 结果被别人写的某个函数给修改掉了. 多难受. 
+接下来. 我们来看一个案例:  
+同时运行下面两组代码：
+// 1号工具人.var name = &quot;猪猪&quot;setTimeout(function()&#123;    console.log(&quot;一号工具人:&quot;+name) // 一号工具人还以为是猪猪呢, 但是该变量是不安全的.&#125;, 5000);
+
+// 2号工具人var name = &quot;小林子&quot;console.log(&quot;二号工具人&quot;, name);
+
+两组代码是在同一个空间内执行的. 他们拥有相同的作用域. 此时的变量势必是非常非常不安全的. 那么如何来解决呢?  注意, 在js里. 变量是有作用域的. 也就是说一个变量的声明和使用是有范围的. 不是无限的. 这一点, 很容易验证.
+function fn()&#123;    let love = &quot;爱呀&quot;&#125;fn()console.log(love)
+
+直接就报错了.  也就是说. 在js里是有全局和局部的概念的. 
+直接声明在最外层的变量就是全局变量. 所有函数, 所有代码块都可以共享的. 但是反过来就不是了. 在函数内和代码块内声明的变量. 它是一个局部变量. 外界是无法进行访问的. 我们就可以利用这一点来给每个工具人创建一个局部空间. 就像这样:
+// 1号工具人.(function()&#123;    var name = &quot;猪猪&quot;;    setTimeout(function()&#123;        console.log(&quot;一号工具人:&quot;+name) // 一号工具人还以为是alex呢, 但是该变量是不安全的.    &#125;, 5000);&#125;)();// 二号工具人(function()&#123;    var name = &quot;小林子&quot;    console.log(&quot;二号工具人&quot;, name);&#125;)();
+
+这样虽然解决了变量的冲突问题. 但是…我们想想. 如果在函数外面需要函数内部的一些东西来帮我进行相关操作怎么办…比如, 一号工具人要提供一个功能(加密). 外界要调用. 怎么办?  
+// 1号工具人.let encrypt_tool = (function()&#123;    let log_msg = &#x27;开始加密......\n&#x27;    // 我是一个加密函数    let encrypt = function(data)&#123;  // 数据        console.log(log_msg) //打印日志信息（访问外部变量）        // 返回密文        return atob(data);    &#125;    // 外面需要用到这个功能啊. 你得把这个东东返回啊. 返回加密函数    return encrypt;&#125;)();//外部调用console.log(encrypt_tool(&#x27;i love you&#x27;));
+
+注意了. 我们如果封装一个加密js包的时候. 好像还得准备出解密的功能. 并且, 不可能一个js包就一个功能吧. 那怎么办?  我们可以返回一个对象. 对象里面可以存放好多个功能. 而一些不希望外界触碰的功能. 就可以很好的保护起来. 
+// 1号工具人.let encrypt_tool = (function()&#123;    let log_msg_1 = &#x27;开始加密......&#x27;    let log_msg_2 = &#x27;开始解密......&#x27;    // 我是一个加密函数    let encrypt = function(data)&#123;  // 被加密数据        console.log(log_msg_1) //打印日志信息（访问外部变量）        // 返回密文        return atob(data);    &#125;;    //解密函数    let decrypt = function(en_data)&#123;  // 加密后的数据        console.log(log_msg_2) //打印日志信息（访问外部变量）        // 返回解密后的原数据        return btoa(en_data);    &#125;;    // 外面需要用到这个功能啊. 你得把这个东东返回啊. 返回加密函数    return &#123;&#x27;encrypt&#x27;:encrypt,&#x27;decrypt&#x27;:decrypt&#125;;&#125;)();//外部调用en_data = encrypt_tool.encrypt(&#x27;i love you&#x27;);de_data = encrypt_tool.decrypt(en_data)console.log(en_data);console.log(de_data);
+
+
+
+OK. 至此. 何为闭包? 上面这个就是闭包. 相信你百度一下就会知道. 什么内层函数使用外层函数变量. 什么让一个变量常驻内存.等等. 其实你细看. 它之所以称之为闭包~. 它是一个封闭的环境. 在内部. 自己和自己玩儿. 避免了对该模块内部的冲击和改动. 避免的变量之间的冲突问题. 
+闭包的特点:
+
+内层函数对外层函数变量的使用. 
+会让变量常驻与内存.
+
+]]></content>
+  </entry>
+  <entry>
+    <title>js逆向学习（三）</title>
+    <url>/2025/04/25/js%E5%AD%A6%E4%B9%A0%EF%BC%88%E4%B8%89%EF%BC%89/</url>
+    <content><![CDATA[变量提升(不正常现象)看以下代码, 或多或少会有些问题的.
+function fn()&#123;    console.log(name);    var name = &#x27;cyt&#x27;;&#125;fn()
+
+发现问题了么. 这么写代码, 在其他语言里. 绝对是不允许的. 但是在js里. 不但允许, 还能执行. 为什么呢?  因为在js执行的时候. 它会首先检测你的代码.  发现在代码中会有name使用. OK. 运行时就会变成这样的逻辑:
+function fn()&#123;    var name;    console.log(name);    name = &#x27;cyt&#x27;;&#125;fn()console.log(a);
+
+看到了么. 实际运行的时候和我们写代码的顺序可能会不一样….这种把变量提前到代码块第一部分运行的逻辑被称为变量提升. 这在其他语言里是绝对没有的. 并且也不是什么好事情. 正常的逻辑不应该是这样的. 那么怎么办?  在新的ES6中. 就明确了, 这样使用变量是不完善的. es6提出. 用let来声明变量. 就不会出现该问题了. 
+function fn()&#123;    console.log(name);  // 直接报错, let变量不可以变量提升.    let name = &#x27;大马猴&#x27;; &#125;fn()
+
+&#x3D;&#x3D;结论一, 用let声明变量是新版本javascript提倡的一种声明变量的方案. &#x3D;&#x3D; 
+let还有哪些作用呢?  
+function fn()&#123;    // console.log(name);  // 直接报错, let变量不可以变量提升.    // let name = &#x27;大马猴&#x27;;    var name = &quot;周杰伦&quot;;    var name = &quot;王力宏&quot;;    console.log(name);&#125;fn()
+
+显然一个变量被声明了两次. 这样也是不合理的. var本意是声明变量. 同一个东西. 被声明两次. 所以ES6规定. let声明的变量. 在同一个作用域内. 只能声明一次. 
+function fn()&#123;    // console.log(name);  // 直接报错, let变量不可以变量提升.    // let name = &#x27;大马猴&#x27;;    let name = &quot;周杰伦&quot;;    console.log(name);    let name = &quot;王力宏&quot;;    console.log(name);&#125;fn()
+
+注意, 报错是发生在代码检查阶段. 所以. 上述代码根本就执行不了. 
+&#x3D;&#x3D;结论二, 在同一个作用域内. let声明的变量只能声明一次. 其他使用上和var没有差别&#x3D;&#x3D;
+js包的导入（exports）类似Python中的模块导入
+// functions.js文件// 加法函数function add(a, b) &#123;  return a + b;&#125;// 乘法函数function multiply(a, b) &#123;  return a * b;&#125;// 导出函数exports.add = add;exports.multiply = multiply;
+
+// main.js// 导入 functions 模块const functions = require(&#x27;./functions&#x27;);// 使用导入的函数console.log(functions.add(2, 3));  // 输出: 5console.log(functions.multiply(4, 5));  // 输出: 20
 ]]></content>
   </entry>
   <entry>
